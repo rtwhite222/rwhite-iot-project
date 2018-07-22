@@ -175,7 +175,7 @@ if not _G.mySmqBrokerDir then
 end
 trace(mySmqBrokerDir)
 local function check(notUsed,ptid)
-    trace"hi"
+    trace"hi world"
 end
 trace(mySmqBrokerDir)
 local function checkthesecond(thisisused,ptid)
@@ -184,3 +184,4 @@ end
 
 smq.subscribe("/m2m/led/display", {onmsg=check});
 smq.subscribe("/m2m/led/device", {onmsg=checkthesecond});
+

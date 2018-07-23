@@ -1,4 +1,14 @@
 <!DOCTYPE html>
+<?lsp usersession = request:session()
+if not usersession then response:forward"login.lsp" end
+function checkLogin()
+    if not usersession.loggedin then
+        print "not logged in"
+        response:forward"login.lsp"
+    end
+end
+checkLogin()
+?>
 <html>
 <head>
 <meta charset="UTF-8" />
@@ -73,7 +83,7 @@ function temp2html(temp) {
    devices are connected.
 */
 function printNoDevs() {
-    $("#nodev").html('<h2>No Devices Connected</h2><p>Download the <a href="https://realtimelogic.com/products/simplemq/src/">SMQ source code</a> and build!</p>').show();
+    $("#nodev").html('<h2>There are currently no devices connected</p>').show();
 }
 
 
@@ -94,8 +104,7 @@ $(function() {
     }
 
     // Create a SimpleMQ instance and connect to the broker.
-    //var smq = SMQ.Client(SMQ.wsURL("/smq.lsp"));
-    var smq = SMQ.Client(SMQ.wsURL("/Server-Broker-Test8/"));
+    var smq = SMQ.Client(SMQ.wsURL("/smq.lsp"));
 
     /* We use the onmsg as a "catch all" for non managed messages we
        receive. This function should not be called since we install
@@ -228,7 +237,7 @@ $(function() {
     <tr>
       <td valign="top">
         <ul id="nav">
-          <li><a id="nav-0" href="#">Here<span>SMQ LED Demo Introduction</span></a></li>
+          <li><a id="nav-0" href="#">No Devices<span>SMQ LED Demo Introduction</span></a></li>
         </ul>
       </td>
       <td valign="top" id="devices">

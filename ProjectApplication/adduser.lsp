@@ -1,4 +1,17 @@
 <!DOCTYPE html>
+<?lsp
+
+usersession = request:session()
+if not usersession then response:forward"login.lsp" end
+function checkLogin()
+    if not usersession.loggedin then
+        print "not logged in"
+        response:forward"login.lsp"
+    end
+end
+checkLogin()
+
+?>
 <html>
     <head>
         <meta charset="UTF-8"/>
@@ -14,10 +27,10 @@
         
 
 <form method="post">
-Name: <input type="text" name="name"><br>
-Password: <input type="password" name="password"><br>
-Confirm Password: <input type="password" name="passwordCheck"><br>
-Company: <select name="companyName">
+Name:<br> <input type="text" name="name" required><br>
+Password:<br> <input type="password" name="password" required><br>
+Confirm Password:<br> <input type="password" name="passwordCheck" required><br>
+Company:<br> <select name="companyName" required>
 <option value=""></option>
 
 <?lsp 
@@ -39,26 +52,29 @@ Company: <select name="companyName">
             return su.open"file" 
         end
         
-        local ok,err=su.select(opendb,string.format(sql), execute)
+        local ok,err=su.select(opendb,string.format(sql), execute) --]
         
         
         ?>
 </select><br>
 
 
-Phone Number: <input type="text" name="phoneNumber"><br>
-Email: <input type="text" name="emailAddress"><br>
-Permission Level: <select name="permissionLevel"><br>
+Phone Number:<br> <input type="text" name="phoneNumber"><br>
+Email:<br> <input type="text" name="emailAddress" required><br>
+Permission Level:<br> <select name="permissionLevel" required><br>
 <option value=""></option>
 
 <?lsp 
+
+usersession = request:session()
+if not usersession then response:forward"login.lsp" end
         local su=require"sqlutil"
         local sql=string.format("PermissionLevel FROM permissions")
         
 
         local function execute(cur)
         local permissions = cur:fetch()
-        
+        trace("here")
         while permissions do
            response:write("<option value="..permissions..">"..permissions.."</option>")
            permissions = cur:fetch()
@@ -71,7 +87,6 @@ Permission Level: <select name="permissionLevel"><br>
         end
         
         local ok,err=su.select(opendb,string.format(sql), execute)
-        
         
         ?></select><br>
 <!-- <button type = "button" onClick = optionsPage() >Login</button> -->
@@ -111,10 +126,10 @@ if request:method() == "POST"  then
         
         su.close(env,conn)
         trace(value)
-    else
+    else if userTable.password ~= userTable.passwordCheck then 
         print("Password mismach. Try again")
     end
-    
+    end
 end
 
 ?>

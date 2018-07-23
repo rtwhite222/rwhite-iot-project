@@ -20,7 +20,6 @@ local su=require"sqlutil"
         
         local function exec(cur)
             local user,activitytime,action = cur:fetch()
-            trace(user)
             while user do
                 
                 --local function execute(c2)
@@ -34,7 +33,6 @@ local su=require"sqlutil"
                     .."<br></h3>")
                 
                user,activitytime,action = cur:fetch()
-               trace(user)
             end
             --write("</div>")
             return true

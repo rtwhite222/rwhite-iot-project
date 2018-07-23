@@ -1,6 +1,16 @@
 <!DOCTYPE html>
 <?lsp
 
+usersession = request:session()
+if not usersession then response:forward"login.lsp" end
+function checkLogin()
+    if not usersession.loggedin then
+        print "not logged in"
+        response:forward"login.lsp"
+    end
+end
+checkLogin()
+
 local su=require"sqlutil"
         --local sql=string.format("username,companyname,PasswordExpiry,CompanyName,ContactNumber,Email,permissionlevel FROM users")
         local sql = selectQuery({"*"},"userlogs");

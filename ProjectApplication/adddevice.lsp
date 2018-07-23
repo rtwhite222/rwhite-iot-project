@@ -175,7 +175,6 @@ $(function() {
             $('#nav-'+ptid).remove(); /* Remove the tab in the left pane */
             if(--connectedDevs == 0)
                 printNoDevs();
-            $("#pong")[0].play();
         });
 
         $('#nav').append('<li><a id="nav-'+ ptid+'" href="#">'+escapeHtml(info.ipaddr)+'<span>'+
@@ -187,7 +186,6 @@ $(function() {
             $("#dev-"+ptid).show(); // Show our new HTML
             $("#nav-"+ptid).addClass("selected"); // Make the tab in the left pane "selected"
         }
-        $("#ping")[0].play();
     } // End function devInfo
     
     function devcheck(info,ptid){
@@ -254,9 +252,6 @@ $(function() {
   <div id="nodev">
     <h2>Connecting....</h2>
   </div>
-  <audio id="switch"><source src="switch.mp3" type="audio/mp3" /></audio>
-  <audio id="ping"><source src="ping.mp3" type="audio/mp3" /></audio>
-  <audio id="pong"><source src="pong.mp3" type="audio/mp3" /></audio>
 </body>
 <a href="options.lsp">Go back</a>
 </html>

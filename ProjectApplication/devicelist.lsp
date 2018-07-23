@@ -219,7 +219,6 @@ $(function() {
             $('#nav-'+ptid).remove(); /* Remove the tab in the left pane */
             if(--connectedDevs == 0)
                 printNoDevs();
-            $("#pong")[0].play();
         });
 
         /* Create a tab in the left pane for this device. We can have
@@ -235,7 +234,6 @@ $(function() {
             $("#dev-"+ptid).show(); // Show our new HTML
             $("#nav-"+ptid).addClass("selected"); // Make the tabe in the left pane "selected"
         }
-        $("#ping")[0].play();
     } // End function devInfo
 
     /* Function 'led' is installed as a SimpleMQ callback for the
@@ -263,7 +261,6 @@ $(function() {
         else
             $(ledId).addClass('led-off');
             //$('#nav-'+ptid).removeClass("selected");
-        $("#switch")[0].play();
     };
 
     function onTemp(data, ptid) {
@@ -343,9 +340,6 @@ $(function() {
   <div id="nodev">
     <h2>Connecting....</h2>
   </div>
-  <audio id="switch"><source src="switch.mp3" type="audio/mp3" /></audio>
-  <audio id="ping"><source src="ping.mp3" type="audio/mp3" /></audio>
-  <audio id="pong"><source src="pong.mp3" type="audio/mp3" /></audio>
   <a href="options.lsp">Go back</a>
 </body>
 </html>

@@ -25,10 +25,8 @@
     
 <?lsp -- START SERVER SIDE CODE
 usersession = request:session()
---usersession = nil
 if not usersession then response:forward"login.lsp" end
---local loginCheck = require("ProjectApplication.lua.loginChecks")
---print(loginCheck)
+
 local sql = selectQueryWhere({"password"},"users","username","a");
 print(sql)
 function checkLogin()

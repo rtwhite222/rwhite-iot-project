@@ -1,4 +1,18 @@
 <!DOCTYPE html>
+
+<?lsp
+
+usersession = request:session()
+if not usersession then response:forward"login.lsp" end
+function checkLogin()
+    if not usersession.loggedin then
+        print "not logged in"
+        response:forward"login.lsp"
+    end
+end
+checkLogin()
+
+?>
 <html>
     <head>
         <meta charset="UTF-8"/>

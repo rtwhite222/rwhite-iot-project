@@ -52,7 +52,7 @@ Company:<br> <select name="companyName" required>
             return su.open"file" 
         end
         
-        local ok,err=su.select(opendb,string.format(sql), execute) --]
+        local ok,err=su.select(opendb,string.format(sql), execute)
         
         
         ?>

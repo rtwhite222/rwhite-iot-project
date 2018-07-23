@@ -1,4 +1,7 @@
 <!DOCTYPE html>
+<style>table, th, td {
+    border: 1px solid black;
+}</style>
 <?lsp
 
 usersession = request:session()
@@ -17,7 +20,7 @@ local su=require"sqlutil"
         local function opendb() 
             return su.open"file" 
         end
-        
+        response:write("<table><th>user</th><th>time</th><th>action</th>")
         local function exec(cur)
             local user,activitytime,action = cur:fetch()
             while user do
@@ -28,12 +31,15 @@ local su=require"sqlutil"
                 --end
                 --local ok,err=su.select(opendb,string.format(sqlSelectUser), execute(c2))
                 
-                response:write("<div ><h3>"
-                    .."user: ".. user .." <br>activity time: "..activitytime .." <br>action: "..action.."<br><br>"
-                    .."<br></h3>")
+
+                
+                response:write("<tr>"
+                    .."<td>".. user .." </td><td>"..(os.date("%c", activitytime)) .." </td><td>"..action.."</td>"
+                    .."</tr>")
                 
                user,activitytime,action = cur:fetch()
             end
+            response:write("</table>")
             --write("</div>")
             return true
         end

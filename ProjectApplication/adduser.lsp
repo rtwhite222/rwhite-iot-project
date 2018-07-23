@@ -74,7 +74,6 @@ if not usersession then response:forward"login.lsp" end
 
         local function execute(cur)
         local permissions = cur:fetch()
-        trace("here")
         while permissions do
            response:write("<option value="..permissions..">"..permissions.."</option>")
            permissions = cur:fetch()

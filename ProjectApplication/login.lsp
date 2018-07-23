@@ -60,15 +60,12 @@ if request:method() == "POST" and (os.time()>(usersession.lockoutuntil or 0)) th
         
        if (--luaTable.name == "root" and 
            luaTable.password == password) then
-            print("working")
-            trace"Logging in"
             --loginattempt:terminate()
             usersession.loggedin = true
             usersession.loggedinas = luaTable.name
             usersession.loginattempts = 0
             
              local sql= "INSERT INTO userlogs VALUES('"..luaTable.name.."','"..os.time().."','User Login');"
-             trace(sql)
             local env,conn = su.open"file"
             local ok,err=conn:execute(sql)
             su.close(env,conn)
@@ -77,7 +74,6 @@ if request:method() == "POST" and (os.time()>(usersession.lockoutuntil or 0)) th
             response:write("DB err: "..err) 
         end
         --if ok then
-        --    response:write("login is a go") end
            response:forward"options.lsp"
             
             

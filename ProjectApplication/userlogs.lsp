@@ -14,7 +14,6 @@ checkLogin()
 local su=require"sqlutil"
         --local sql=string.format("username,companyname,PasswordExpiry,CompanyName,ContactNumber,Email,permissionlevel FROM users")
         local sql = selectQuery({"*"},"userlogs");
-    trace(sql)
         local function opendb() 
             return su.open"file" 
         end

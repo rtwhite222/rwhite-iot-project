@@ -27,8 +27,7 @@
 usersession = request:session()
 if not usersession then response:forward"login.lsp" end
 
-local sql = selectQueryWhere({"password"},"users","username","a");
-print(sql)
+--local sql = selectQueryWhere({"password"},"users","username","a");
 function checkLogin()
     if not usersession.loggedin then
         print "not logged in"

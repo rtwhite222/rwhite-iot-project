@@ -67,7 +67,7 @@ if request:method() == "POST" and (os.time()>(usersession.lockoutuntil or 0)) th
             usersession.loggedinas = luaTable.name
             usersession.loginattempts = 0
             
-             local sql= "INSERT INTO userlogs (username,time,message) VALUES('"..luaTable.name.."','"..os.time().."','User Login');"
+             local sql= "INSERT INTO userlogs VALUES('"..luaTable.name.."','"..os.time().."','User Login');"
              trace(sql)
             local env,conn = su.open"file"
             local ok,err=conn:execute(sql)

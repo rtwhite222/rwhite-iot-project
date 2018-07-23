@@ -20,9 +20,9 @@
 
 <form method="post">
 Name:
-<br><input type="text" name="name" autofocus><br>
+<br><input type="text" name="name" autofocus required><br>
 Password: 
-<br><input type="password" name="password"><br>
+<br><input type="password" name="password" required><br>
 <!-- <button type = "button" onClick = optionsPage() >Login</button> -->
 <input type="submit" value = "Login">
 </form>

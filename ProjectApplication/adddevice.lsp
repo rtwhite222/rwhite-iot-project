@@ -104,7 +104,7 @@ $(function() {
     }
 
     // Create a SimpleMQ instance and connect to the broker.
-    var smq = SMQ.Client(SMQ.wsURL("/smq.lsp"));
+    var smq = SMQ.Client(SMQ.wsURL("/Server-Broker-Test8/"));
 
     /* We use the onmsg as a "catch all" for non managed messages we
        receive. This function should not be called since we install

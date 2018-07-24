@@ -43,13 +43,13 @@ checkLogin()
         local su=require"sqlutil"
         --local sql=string.format("username,companyname,PasswordExpiry,CompanyName,ContactNumber,Email,permissionlevel FROM users")
         usersession = request:session()
-        local sql = selectQueryWhere({"username","companyname","passwordexpiry","companyname","contactnumber","email","permissionlevel"},"users","username",usersession.loggedinas);
+        local sql = selectQueryWhere({"username","companyname","passwordexpiry","contactnumber","email","permissionlevel"},"users","username",usersession.loggedinas);
         local function opendb() 
             return su.open"file" 
         end
 
         local function exec(cur)
-            local user,company,passwordexpiry,company,number,email,permissions = cur:fetch()
+            local username,companyname,passwordexpiry,contactnumber,email,permissionlevel = cur:fetch()
 
                 --local function execute(c2)
                 --    local = c2:fetch() 
@@ -57,14 +57,14 @@ checkLogin()
                 --end
                 --local ok,err=su.select(opendb,string.format(sqlSelectUser), execute(c2))
                 
-                response:write("<div id='"..user.."'>"
+                response:write("<div id='"..username.."'>"
                     .."<h3>"
-                    .."Username: "..user.. "<br><br>"
+                    .."Username: "..username.. "<br><br>"
                     .."Password Expiry Date: "..passwordexpiry.."<br><br>"
-                    .."Related Company: "..company.."<br><br>"
-                    .."Contact Number: "..number.."<br><br>"
+                    .."Related Company: "..companyname.."<br><br>"
+                    .."Contact Number: "..contactnumber.."<br><br>"
                     .."Email Address: "..email.."<br><br>"
-                    .."Granted Permission Level: "..permissions.."<br>"
+                    .."Granted Permission Level: "..permissionlevel.."<br>"
                     .."<br></h3></div>")
                user,company,passwordexpiry,company,number,email,permissions = cur:fetch()
             return true
@@ -78,7 +78,7 @@ checkLogin()
         ?>
         
         <form method="post">
-Name: <input type="text" name="name"><br>
+Name: <input type="text" name="username"><br>
 Password: <input type="password" name="password"><br>
 Confirm Password: <input type="password" name="passwordCheck"><br>
 Company: <select name="companyName">
@@ -113,11 +113,11 @@ Company: <select name="companyName">
 </select><br>
 
 
-Phone Number: <input type="text" name="phoneNumber"><br>
-Email: <input type="text" name="emailAddress"><br>
+Phone Number: <input type="text" name="ContactNumber"><br>
+Email: <input type="text" name="email"><br>
 Permission Level: <input type="text" name="permissionLevel"><br>
 <!-- <button type = "button" onClick = optionsPage() >Login</button> -->
-<button type="submit">Create New User</button>
+<button type="submit">Update User Settings</button>
 </form>
 
 <pre style="background:red">
@@ -132,27 +132,19 @@ if request:method() == "POST" then
   
     local su=require"sqlutil"
     local env,conn = su.open"file"
-    local sql= "INSERT INTO users(username,password,PasswordExpiry,CompanyName,ContactNumber,Email,permissionlevel) VALUES("
-    sql = string.format(sql .. "'" .. userTable.name .. "',")
-    sql = string.format(sql .. "'" .. userTable.password .. "',")
-    --local expirytime = os.time()+60*60*24*180
-    --DATEADD(MONTH,6,GETDATE())
-    sql = string.format(sql .. '0' .. ",")
-    sql = string.format(sql .. "'" .. userTable.companyName .. "',")
-    sql = string.format(sql .. "'" .. userTable.phoneNumber .. "',")
-    sql = string.format(sql .. "'" .. userTable.emailAddress .. "',")
-    sql = string.format(sql .. "'" .. userTable.permissionLevel .. "');")
-    --print(sql)
     
+    local sql = updateQueryWhere(userTable,'users', 'username', usersession.loggedinas)
+    
+    print(sql)
     ok, err = conn:execute(sql)
     if ok then 
-        print("New user created")
+        print("User settings updated")
     else
-        print("New user create failed ",err)
+        print("SQL update failed ",err)
     end
     
-    su.close(env,conn)
-    trace(value)
+    --su.close(env,conn)
+    --trace(value)
 end
 ?>
 <a href="options.lsp">Go back</a>

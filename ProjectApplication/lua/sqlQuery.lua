@@ -27,15 +27,20 @@ function selectQuery(getValues,SQLtable)
 end
 -- Function to create string to be input as SQL select
 
-function updateQueryWhere(getValues,SQLtable,valueUpdates, attribute, entity)
+function updateQueryWhere(getValues,SQLtable, attribute, entity)
     local sql = "UPDATE " .. SQLtable .. " SET "
-    for value, getValues in ipairs(getValues) do
-        if(value == 1) then
-            sql = sql .. getValues .. " = '" .. valueUpdates[value] .. "'" 
-        else
-            sql = sql .. ", " .. getValues .. " = '" .. valueUpdates[value] .. "'"
+    local checked = false
+    
+    for name, value in pairs(getValues) do
+        trace(value)
+        if not (value == "") then
+            if not checked then
+                sql = sql .. name .. " = '" .. value .. "'" 
+                checked = true
+            else
+                sql = sql .. ", " .. name .. " = '" .. value .. "'"
+            end
         end
-        
     end
     sql = sql .. " WHERE " .. attribute .. " = '" .. entity .. "';"
     return sql

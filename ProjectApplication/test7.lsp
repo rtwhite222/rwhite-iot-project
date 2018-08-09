@@ -1,5 +1,20 @@
 <!DOCTYPE html>
- 
+ <nav class="navbar navbar-inverse">
+  <div class="container-fluid">
+    <div class="navbar-header">
+      <a class="navbar-brand" href="#">Othername</a>
+    </div>
+    <ul class="nav navbar-nav">
+      <li class="active"><a href="#">Devices</a></li>
+      <li><a href="#">Page 1</a></li>
+      <li><a href="#">Page 2</a></li><li><a href="#">Page 2</a></li><li><a href="#">Page 2</a></li>
+    </ul>
+    <ul class="nav navbar-nav navbar-right">
+      <li><a href="#"><span class="glyphicon glyphicon-user"></span> My Profile</a></li>
+      <li><a href="#"><span class="glyphicon glyphicon-log-in"></span> Log Out</a></li>
+    </ul>
+  </div>
+</nav> 
 <?lsp
 
 usersession = request:session()
@@ -160,22 +175,13 @@ $(function() {
             "</td>"+
         "</tr> ");
         $("#devicesList").append(html);
-        
         $(".clickable-row").click(function(ev) {
             var message = '#dev-'+ptid;
             smq.publish(getCompany()+"\0",ptid);
             smq.publish(message,"deviceremove")
-            $.ajax({
-              type: "POST",
-              url: "deviceaddservercode.lsp",
-              data: {deviceModel: info.devname,companyName: getCompany(),deviceIP:info.ipaddr},
-            success: function(output) {
-                  alert(output);
-                  if(--connectedDevs == 0)
+            $.post("test2.lsp", {deviceModel: info.devname,companyName: getCompany(),deviceIP:info.ipaddr})
+            if(--connectedDevs == 0)
                 printNoDevs();
-              }
-            });
-            
         });
         smq.observe(ptid, function() {
             $('#dev-'+ptid).remove();
@@ -189,9 +195,9 @@ $(function() {
     } //devInfo
     
     
-    /*function removeDevice(ptid){
+    function removeDevice(ptid){
         $('#dev-'+ptid).remove();
-    };*/
+    };
     
     
     smq.subscribe("nocompany", {"datatype":"json", "onmsg":devInfo});
@@ -207,16 +213,8 @@ $(function() {
 
 </script>
 </head>
+
 <body>
-<div id="new-header">
-    <script>
-    $("#new-header").load("repeatfiles/header.html?version=9", function() {
-        $('#header-addDevices').addClass('active');
-    });
-    </script>
-</div>
-
-
   <div class="container">
 	<div class="row">
         <div class="panel panel-default user_panel">

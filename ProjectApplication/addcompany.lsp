@@ -41,13 +41,14 @@ if request:method() == "POST" then
    -- -- -- --
     local su=require"sqlutil"
     local env,conn = su.open"file"
-    local sql= "INSERT INTO company VALUES("
-    sql = string.format(sql .. "'" .. companyTable.name .. "',")
-    sql = string.format(sql .. "'" .. companyTable.street .. "',")
-    sql = string.format(sql .. "'" .. companyTable.city .. "',")
-    sql = string.format(sql .. "'" .. companyTable.postcode .. "',")
-    sql = string.format(sql .. "'" .. companyTable.emailAddress .. "',")
-    sql = string.format(sql .. "'" .. companyTable.contactNumber .. "');")
+    --local sql= "INSERT INTO company VALUES("
+    --sql = string.format(sql .. "'" .. companyTable.name .. "',")
+    --sql = string.format(sql .. "'" .. companyTable.street .. "',")
+    --sql = string.format(sql .. "'" .. companyTable.city .. "',")
+    --sql = string.format(sql .. "'" .. companyTable.postcode .. "',")
+    --sql = string.format(sql .. "'" .. companyTable.emailAddress .. "',")
+    --sql = string.format(sql .. "'" .. companyTable.contactNumber .. "');")
+    local sql = insertQuery(companyTable,"company")
     
     ok, err = conn:execute(sql)
     if ok then 

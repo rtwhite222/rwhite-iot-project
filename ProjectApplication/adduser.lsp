@@ -17,8 +17,12 @@ checkLogin()
         <meta charset="UTF-8"/>
         <meta name="viewport" content="width=device-width, height=device-height, initial-scale=1">
         <title>Login Page</title>
-        <link rel="stylesheet" href="cssfiles/button.css?version=3">
         
+        <link rel="stylesheet" href="cssfiles/button.css?version=4">
+            <link rel="stylesheet" href="cssfiles/inputForms.css?version=3">
+                <style>body{
+    color: white;
+}</style>
     </head>
     
     
@@ -38,15 +42,13 @@ Company:<br> <select name="companyName" required>
         local sql=string.format("companyName FROM company")
         
         local function execute(cur)
-            
-        local company = cur:fetch()
-        
-        while company do
-           response:write("<option value="..company..">"..company.."</option>")
-           company = cur:fetch()
+            local company = cur:fetch()
+            while company do
+               response:write("<option value="..company..">"..company.."</option>")
+               company = cur:fetch()
+            end
+            return true
         end
-        return true
-     end
         
         local function opendb() 
             return su.open"file" 
@@ -75,7 +77,7 @@ if not usersession then response:forward"login.lsp" end
         local function execute(cur)
         local permissions = cur:fetch()
         while permissions do
-           response:write("<option value="..permissions..">"..permissions.."</option>")
+           print("<option value="..permissions..">"..permissions.."</option>")
            permissions = cur:fetch()
         end
         return true
@@ -89,7 +91,7 @@ if not usersession then response:forward"login.lsp" end
         
         ?></select><br>
 <!-- <button type = "button" onClick = optionsPage() >Login</button> -->
-<button type="submit">Create New User</button>
+<input type="submit" value = "Create new user"></button>
 </form>
 
 <pre style="background:red">

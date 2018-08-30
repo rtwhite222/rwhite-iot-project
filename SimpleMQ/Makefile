@@ -41,8 +41,8 @@ endif
 
 LIBNAME=$(LIBPFX)SimpleMQ$(LIBEXT) 
 
-CFLAGS+=$(IFT)src $(IFT)examples
-VPATH=src:examples
+CFLAGS+=$(IFT)src $(IFT)machine-client
+VPATH=src:machine-client
 
 # Implicit rules for making .o files from .c files
 $(ODIR)/%$(O) : %.c
@@ -51,12 +51,12 @@ $(ODIR)/%$(O) : %.c
 SOURCE = selib.c SMQClient.c
 
 
-examples: $(ODIR) led-smq$(EXT)
+machine-client: $(ODIR) led-smq$(EXT)
 
 $(ODIR):
 	mkdir $(ODIR)
 
-led-smq$(EXT): $(ODIR)/m2m-led$(O) $(LIBNAME)
+led-smq$(EXT): $(ODIR)/m2m-control$(O) $(LIBNAME)
 	$(CC) $(LNKOFT)$@ $< -L. -lwiringPi -lSimpleMQ $(EXTRALIBS)
 
 $(LIBNAME):  $(SOURCE:%.c=$(ODIR)/%$(O))

@@ -1,7 +1,5 @@
-<!DOCTYPE html>
-<style>table, th, td {
-    border: 1px solid black;
-}</style>
+<!DOCTYPE html><link href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.0/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css"><script src="https://use.fontawesome.com/1e803d693b.js"></script>
+
 <?lsp
 
 usersession = request:session()
@@ -20,7 +18,9 @@ local su=require"sqlutil"
         local function opendb() 
             return su.open"file" 
         end
-        response:write("<table><th>user</th><th>time</th><th>action</th>")
+        ?>
+        <table class="table table-striped" ><thead><th scope="col">user</th><th scope="col">time</th><th scope="col">action</th></thead><tbody>
+        <?lsp
         local function exec(cur)
             local user,activitytime,action = cur:fetch()
             while user do
@@ -32,14 +32,14 @@ local su=require"sqlutil"
                 --local ok,err=su.select(opendb,string.format(sqlSelectUser), execute(c2))
                 
 
-                
-                response:write("<tr>"
-                    .."<td>".. user .." </td><td>"..(os.date("%c", activitytime)) .." </td><td>"..action.."</td>"
-                    .."</tr>")
-                
+                ?>
+                <tr>
+                    <th> <?lsp=user?> </th><th> <?lsp=(os.date("%c", activitytime))?> </th><th> <?lsp=action ?></th>
+                </tr>
+            <?lsp
                user,activitytime,action = cur:fetch()
             end
-            response:write("</table>")
+            response:write("</tbody></table>")
             --write("</div>")
             return true
         end

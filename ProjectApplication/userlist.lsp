@@ -1,89 +1,168 @@
-<!DOCTYPE html>
-<?lsp
+<link href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.0/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
+<script src="//maxcdn.bootstrapcdn.com/bootstrap/3.3.0/js/bootstrap.min.js"></script>
+<script src="//code.jquery.com/jquery-1.11.1.min.js"></script>
+<!------ Include the above in your HEAD tag ---------->
 
-usersession = request:session()
-if not usersession then response:forward"login.lsp" end
-function checkLogin()
-    if not usersession.loggedin then
-        print "not logged in"
-        response:forward"login.lsp"
-    end
-end
+<script src="https://use.fontawesome.com/1e803d693b.js"></script>
+<style>
+    form {
+    display: inline-block;
+}
+tr:hover{
+    background-color: #ddd;
+    color: black;
+}
+
+.search-container select {
+    float: left;
+    border: none;
+    margin-top: 8px;
+    margin-right: 16px;
+    font-size: 17px;
+}
+
+.search-container {
+  float: right;
+}
+
+.search-container input[type=submit] {
+  float: right;
+  margin-top: 8px;
+  margin-right: 16px;
+  background: #ddd;
+  font-size: 17px;
+  border: none;
+  cursor: pointer;
+}
+
+body {
+    background: linear-gradient(to right, rgba(128,128,128,.8), rgba(128,128,128,.3));
+}
+
+</style>
+
+
+
+ <div id="new-header">
+    <script>
+    $("#new-header").load("header.lsp", function() {
+        $('#header-userList').addClass('active');
+    });
+    </script>
+</div>
+
+<div class="container">
+<div class="search-container">
+    <?lsp 
+    usersession = request:session()
+    trace(request:method())
+    if not usersession then response:forward"login.lsp" end
+        function checkLogin()
+            if not usersession.loggedin then
+                print "not logged in"
+                request:session(false)
+                response:forward"login.lsp"
+            end
+        end
 checkLogin()
+    if tonumber(usersession.viewAllUsers) == 1 then ?>
 
-?>
-<html>
-    <head>
-        <meta charset="UTF-8"/>
-        <!--<style> 
-        div.collapse {
-            border: 5px solid;
-            border-radius: 15px 50px;
-            border-color:black;
-            padding-left: 2em;
-            background:black;
-            color:white;
-        }
-        ."btn btn-info" {
-            background:black
-            
-        }
-        </style>
-    -->
-        <meta name="viewport" content="width=device-width, initial-scale=1">
-        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
-        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
-        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
-        <title>User List</title>
-    </head>
-  
-    <body>
-        <div class="container">
-     <?lsp 
+    <form method = "post">
+        <select name="companyName" >  <option value=""></option>
+<?lsp 
         local su=require"sqlutil"
-        --local sql=string.format("username,companyname,PasswordExpiry,CompanyName,ContactNumber,Email,permissionlevel FROM users")
-        local sql = selectQuery({"username","companyname","passwordexpiry","companyname","contactnumber","email","permissionlevel"},"users");
+        local sql=string.format("companyName FROM company")
+        
+        local function execute(cur)
+            local company = cur:fetch()
+            while company do
+               response:write("<option value='"..company.."'>"..company.."</option>")
+               company = cur:fetch()
+            end
+            return true
+        end
+        
         local function opendb() 
             return su.open"file" 
         end
-
-        local function exec(cur)
-            local user,company,passwordexpiry,company,number,email,permissions = cur:fetch()
-            while user do
-
-                --local function execute(c2)
-                --    local = c2:fetch() 
-                    
-                --end
-                --local ok,err=su.select(opendb,string.format(sqlSelectUser), execute(c2))
-                
-                response:write("<button type='button' class='btn btn-info' data-toggle='collapse' data-target='#"..user.."'>"..user.." | "..company.."</button><br>")
-                response:write("<div id='"..user.."' class='collapse'>"
-                    .."<h3>"
-                    .."Username: "..user.. "<br><br>"
-                    .."Password Expiry Date: "..passwordexpiry.."<br><br>"
-                    .."Related Company: "..company.."<br><br>"
-                    .."Contact Number: "..number.."<br><br>"
-                    .."Email Address: "..email.."<br><br>"
-                    .."Granted Permission Level: "..permissions.."<br>"
-                    .."<br></h3></div>")
-                
-               user,company,passwordexpiry,company,number,email,permissions = cur:fetch()
-            end
-            return true
-     end
         
-        
-        
-        local ok,err=su.select(opendb,string.format(sql), exec)
+        local ok,err=su.select(opendb,string.format(sql), execute)
         
         
         ?>
-  
+        <input type="submit" value = "Search by Company"></button>
+    </form>
+    <?lsp end ?>
+    </div>
+	<div class="row">
+        <div class="panel panel-default user_panel">
+            <div class="panel-heading">
+                <h3 class="panel-title">User List</h3>
+            </div>
+            <div class="panel-body">
+				<div class="table-container">
+                    <table class="table-users table" border="0">
+                        <tbody>
+                        <?lsp 
+                        
+                        local su=require"sqlutil"
+                        local sql
+                        
+                        
+                        if (tonumber(usersession.viewAllUsers) == 1) then
+                            sql = selectQuery({"username","companyname","Email","permissionlevel"},"users")
+                        trace(sql)
+                            if request:method() == "POST" and request:data().companyName ~= "" then
+                                sql = selectQueryWhere({"username","companyname","Email","permissionlevel"},"users","CompanyName", request:data().companyName)
+                            trace(sql)
+                            end
+                        else 
+                            sql = selectQueryWhere({"username","companyname","Email","permissionlevel"},"users","CompanyName", usersession.company)
+                        end
+                        
+                        
+                        
+                        local function opendb() 
+                            return su.open"file" 
+                        end
+                            
+                        local function exec(cur)
+                            local user,company,Email,permissions = cur:fetch()
+                            while Email do
+                                ?>
+                            <tr class='clickable-row' data-href='usersettings.lsp?from=list&userSelect=<?lsp=Email?>'>
+                                <td width='10' align='center'>
+                                    <i class='fa fa-2x fa-user fw'></i>
+                                </td>
+                                <td>
+                                    <?lsp=user?> <br><!--<i class='fa fa-envelope'></i>-->
+                                </td>
+                                <td>
+                                    <?lsp=permissions?> 
+                                </td>
+                                <td align='center'>
+                                    Company<br><small class='text-muted'><?lsp=company ?></small>
+                                </td>
+                            </tr> 
+                                <?lsp
+                               user,company,Email,permissions = cur:fetch()
+                            end
+                            return true
+                        end
+                        
+                        local ok,err=su.select(opendb,string.format(sql), exec)
+                        ?>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
 
-  
+	</div>
 </div>
-</select><br>
-<a href="options.lsp">Go back</a>
-  </body>
-</html>
+<script>
+jQuery(document).ready(function($) {
+    $(".clickable-row").click(function() {
+        window.location = $(this).data("href");
+    });
+});</script>

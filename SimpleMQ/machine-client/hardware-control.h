@@ -35,28 +35,17 @@
  *
  */
 
-#ifndef _ledctrl_h
-#define _ledctrl_h
+#ifndef _hardwarecontrol_h
+#define _hardwarecontrol_h
 
 #include "selib.h"
-
-/* Do not change the number sequence. Must match peer code. */
-typedef enum
-{
-   LedColor_red=0,
-   LedColor_yellow=1,
-   LedColor_green=2,
-   LedColor_blue=3
-} LedColor;
 
 
 /* Each LED is registered with the following information */
 typedef struct {
    const char* name; /* LED name shown in the browser */
-   LedColor color; /* The color of this particular LED */
    int id; /* A unique ID for the LED. ID range can be 0 to 15. */
-   const char* io_type; /* INPUT OR OUTPUT */
-} LedInfo;
+} MachineInfo;
 
 
 typedef enum {
@@ -84,16 +73,16 @@ extern "C" {
 #endif
 
 /*
-  Return an array of LedInfo (struct). Each element in the array
+  Return an array of MachineInfo (struct). Each element in the array
   provides information for one LED. The 'len' argument must be set by
-  function getLedInfo.  The out argument 'en' specifies the length of
+  function getMachineInfo.  The out argument 'en' specifies the length of
   the returned array, that is, number of LEDs in the device.  Each LED
   has a name, color, and ID. The ID, which provides information about
   which LED to turn on/off, is used by control messages sent between
   device code and UI clients. The IDs for a four LED device can for
   example be 1,2,3,4.
 */
-const LedInfo* getLedInfo(int* len);
+const MachineInfo* getMachineInfo(int* len);
 
 
 /* Returns the name of this device. The name is presented by UI
@@ -105,7 +94,7 @@ const char* getDevName(void);
 /* Command sent by UI client to turn LED with ID on or off. This
    function must set the LED to on if 'on' is TRUE and off if 'on' is FALSE.
  */
-int setLed(int ledId, int on);
+int setGPIO(int ledId, int on);
 
 /*
   An optional function that enables LEDs to be set directly by the
@@ -120,11 +109,11 @@ int setLed(int ledId, int on);
   change. Create an empty function returning zero if you do not plan
   on implementing this feature.
 */
-int setLedFromDevice(int* ledId, int* on);
+int setGPIOFromDevice(int* ledId, int* on);
 
 /* Returns the LED on/off state for led with ID 'ledId'.
 */
-int getLedState(int ledId);
+int getGPIOState(int ledId);
 
 /*
 The purpose with program status is to provide visible program

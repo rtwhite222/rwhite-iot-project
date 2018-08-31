@@ -51,12 +51,12 @@ $(ODIR)/%$(O) : %.c
 SOURCE = selib.c SMQClient.c
 
 
-machine-client: $(ODIR) led-smq$(EXT)
+machine-client: $(ODIR) machine-smq$(EXT)
 
 $(ODIR):
 	mkdir $(ODIR)
 
-led-smq$(EXT): $(ODIR)/m2m-control$(O) $(LIBNAME)
+machine-smq$(EXT): $(ODIR)/m2m-control$(O) $(LIBNAME)
 	$(CC) $(LNKOFT)$@ $< -L. -lwiringPi -lSimpleMQ $(EXTRALIBS)
 
 $(LIBNAME):  $(SOURCE:%.c=$(ODIR)/%$(O))

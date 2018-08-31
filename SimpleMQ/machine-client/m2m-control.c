@@ -1,4 +1,5 @@
 /**
+ * This code has been taken from the following base code:
  *     ____             _________                __                _
  *    / __ \___  ____ _/ /_  __(_)___ ___  ___  / /   ____  ____ _(_)____
  *   / /_/ / _ \/ __ `/ / / / / / __ `__ \/ _ \/ /   / __ \/ __ `/ / ___/
@@ -63,11 +64,11 @@
    file and include hardware-control.h. The C file must have the following
    functions (used by the generic code in this file):
    * int getUniqueId(const U8* id);
-   * const LedInfo* getLedInfo(int* len);
+   * const MachineInfo* getMachineInfo(int* len);
    * const char* getDevName(void);
-   * int setLed(int ledId, int on);
-   * int setLedFromDevice(int* ledId, int* on);
-   * int getLedState(int ledId, int on, int set);
+   * int setGPIO(int ledId, int on);
+   * int setGPIOFromDevice(int* ledId, int* on);
+   * int getGPIOState(int ledId, int on, int set);
    * void setProgramStatus(ProgramStatus s);
    * int getUniqueId(const char** id); unless GETUNIQUEID is defined
    * xprintf (selib.h)
@@ -178,123 +179,36 @@ void setProgramStatus(ProgramStatus s)
    This data is encoded as JSON and sent to the UI when a new UI
    requests the device capabilities.
 */
-static const LedInfo ledInfo[] = {
+static const MachineInfo machineInfo[] = {
    {
-      "GPIO 4 - Door",
-      LedColor_red,
-      1,
-      "INPUT"
+      "Door",
+      1
    },
    {
-      "GPIO 5 - Paint sensor 1",
-      LedColor_yellow,
-      2,
-      "INPUT"
+      "Paint sensor 1",
+      2
    },
    {
-      "GPIO 6 - Paint sensor 2",
-      LedColor_green,
-      3,
-      "INPUT"
+      "Paint sensor 2",
+      3
    },
    {
-      "GPIO 12 - On button",
-      LedColor_green,
-      4,
-      "INPUT"
-   },
-   {
-      "GPIO 13",
-      LedColor_green,
-      5,
-      "INPUT"
-   },
-
-   {
-      "GPIO 16",
-      LedColor_blue,
-      6,
-      "INPUT"
-   },
-   {
-      "GPIO 17",
-      LedColor_green,
-      7,
-      "INPUT"
-   },
-   {
-      "GPIO 18 - RED LIGHT",
-      LedColor_green,
-      8,
-      "INPUT"
-   },
-   {
-      "GPIO 19",
-      LedColor_green,
-      9,
-      "INPUT"
-   },
-   {
-      "GPIO 20",
-      LedColor_green,
-      10,
-      "INPUT"
-   },
-   {
-      "GPIO 21",
-      LedColor_green,
-      11,
-      "INPUT"
-   },
-   {
-      "GPIO 22 - BUZZER",
-      LedColor_green,
-      12,
-      "INPUT"
-   },
-   {
-      "GPIO 23",
-      LedColor_green,
-      13,
-      "INPUT"
-   },
-   {
-      "GPIO 24 - BLUE LIGHT",
-      LedColor_green,
-      14,
-      "INPUT"
-   },
-   {
-      "GPIO 25",
-      LedColor_green,
-      15,
-      "INPUT"
-   },
-   {
-      "GPIO 26",
-      LedColor_green,
-      16,
-      "INPUT"
-   },
-   {
-      "GPIO 27",
-      LedColor_green,
-      17,
-      "INPUT"
+      "On Button",
+      4
    }
 };
 
-const LedInfo*
-getLedInfo(int* len)
+const MachineInfo*
+getMachineInfo(int* len)
 {
-   *len = sizeof(ledInfo) / sizeof(ledInfo[0]);
-/*printf("%d,%d,%d\n", sizeof(ledInfo),sizeof(ledInfo[0]),sizeof(ledInfo[14]));*/
-   return ledInfo;
+   *len = sizeof(machineInfo) / sizeof(machineInfo[0]);
+/*printf("%d,%d,%d\n", sizeof(machineInfo),sizeof(machineInfo[0]),sizeof(machineInfo[14]));*/
+   return machineInfo;
 }
 
-/* The LEDs: used by getLedState and setLed
+/* The LEDs: used by getGPIOState and setGPIO
  */
-static int leds[sizeof(ledInfo)/sizeof(ledInfo[1])];
+static int leds[sizeof(machineInfo)/sizeof(machineInfo[1])];
 
 /* Returns the LED on/off state for led with ID 'ledId'. The 'ledId'
    is the 'handle' sent by the UI.
@@ -303,9 +217,9 @@ static int leds[sizeof(ledInfo)/sizeof(ledInfo[1])];
 
 
 int
-getLedState(int ledId)
+getGPIOState(int ledId)
 {
-   baAssert(ledId >= 1 && ledId <= sizeof(ledInfo)/sizeof(ledInfo[1]));
+   baAssert(ledId >= 1 && ledId <= sizeof(machineInfo)/sizeof(machineInfo[1]));
    return leds[ledId-1];
 } 
 
@@ -314,10 +228,10 @@ getLedState(int ledId)
  */
 
 int
-setLed(int ledId, int on)
+setGPIO(int ledId, int on)
 {
    int ledPins [17] = {4,5,6,12,13,16,17,18,19,20,21,22,23,24,25,26,27};
-   if(ledId >= 1 && ledId <= sizeof(ledInfo)/sizeof(ledInfo[1]))
+   if(ledId >= 1 && ledId <= sizeof(machineInfo)/sizeof(machineInfo[1]))
    {
       printf("Set LED %d %s\n", ledId, on ? "on" : "off");
       leds[ledId-1] = on;
@@ -336,6 +250,7 @@ setLed(int ledId, int on)
 
       /* If door is opened, turn off gpio pins */
 
+/*
       if(ledId-1 == 0 && on == 0 && leds[7] == 1)
       {
          leds[7] = 0;
@@ -354,16 +269,17 @@ setLed(int ledId, int on)
          digitalWrite(ledPins[13],0);
          
       }
+*/
       return on;
    }
    return -1;
 }
 
 
-/* The optional function setLedFromDevice requires non blocking
+/* The optional function setGPIOFromDevice requires non blocking
  * keyboard I/O in the simulated version. The following code sets this
  * up for WIN and UNIX. Remove this code for embedded use and change
- * setLedFromDevice as explained below.
+ * setGPIOFromDevice as explained below.
  */
 #include <ctype.h>
 #ifdef _WIN32
@@ -522,10 +438,10 @@ getMacAddr(char macaddr[6], const char* ifname)
    information is managed by the online web service. 
 */
 int
-setLedFromDevice(int* ledId, int* on)
+setGPIOFromDevice(int* ledId, int* on)
 {
    int ledLen;
-   const LedInfo* ledInfo = getLedInfo(&ledLen);
+   const MachineInfo* machineInfo = getMachineInfo(&ledLen);
    if(xkbhit())
    {
       int base,i;
@@ -554,7 +470,7 @@ setLedFromDevice(int* ledId, int* on)
       base=0;
       for(i = 0 ; i < ledLen ; i++)
       {
-         if(ledInfo[i].id == c)
+         if(machineInfo[i].id == c)
          {
             base=1;
             break;
@@ -565,9 +481,9 @@ setLedFromDevice(int* ledId, int* on)
          *ledId = c;
          return 1;
       }
-      printf("Invalid LedId %d. Valid keys (upper/lower): ",c);
+      printf("Invalid GPIOId %d. Valid keys (upper/lower): ",c);
       for(i = 0 ; i < ledLen ; i++)
-         printf("%c ",'A'+ledInfo[i].id);
+         printf("%c ",'A'+machineInfo[i].id);
       printf("\n");
    }
 
@@ -727,22 +643,6 @@ int getUniqueId(const char** id)
 
 
 
-
-static const char*
-ledType2String(LedColor t)
-{
-   switch(t)
-   {
-      case LedColor_red: return "red";
-      case LedColor_yellow: return "yellow";
-      case LedColor_green: return "green";
-      case LedColor_blue: return "blue";
-   }
-   baAssert(0);
-   return "";
-}
-
-
 /* Send the device capabilities as JSON to the browser. Note: we could
    have used our JSON library for creating the JSON, but the library
    adds additional code. We have opted to manually craft the JSON
@@ -759,32 +659,34 @@ ledType2String(LedColor t)
    http://jsonlint.com/ 
  */
 static int
-sendDevInfo(SharkMQ* smq, const char* ipaddr, U32 tid, U32 subtid)
+sendDevInfo(SharkMQ* smq, const char* ipaddr, U32 tid, U32 subtid, const char* company)
 {
    int i, ledLen;
    char buf[11];
    char *ptr;
    int val;
-   const LedInfo* ledInfo = getLedInfo(&ledLen);
+   const MachineInfo* machineInfo = getMachineInfo(&ledLen);
 
+   SharkMQ_wrtstr(smq, "\",\"leds\":[");
    SharkMQ_wrtstr(smq, "{\"ipaddr\":\"");
    SharkMQ_wrtstr(smq, ipaddr);
    SharkMQ_wrtstr(smq, "\",\"devname\":\"");
    SharkMQ_wrtstr(smq, getDevName());
+   SharkMQ_wrtstr(smq, "\",\"company\":\"");
+   SharkMQ_wrtstr(smq, company);
    SharkMQ_wrtstr(smq, "\",\"leds\":[");
 
    /* Write JSON:
      {
         "id": number,
         "name": string,
-        "color": string,
         "on": boolean
      }
    */
    for(i = 0 ; i < ledLen ; i++)
    {
       ptr = &buf[(sizeof buf) - 1];
-      val = ledInfo[i].id;
+      val = machineInfo[i].id;
       *ptr = 0; 
       if(i != 0)
          SharkMQ_wrtstr(smq,",");
@@ -796,11 +698,9 @@ sendDevInfo(SharkMQ* smq, const char* ipaddr, U32 tid, U32 subtid)
       } while (val && ptr > buf); 
       SharkMQ_wrtstr(smq, ptr); /* number converted to string */
       SharkMQ_wrtstr(smq, ",\"name\":\"");
-      SharkMQ_wrtstr(smq, ledInfo[i].name);
-      SharkMQ_wrtstr(smq, "\",\"color\":\"");
-      SharkMQ_wrtstr(smq, ledType2String(ledInfo[i].color));
+      SharkMQ_wrtstr(smq, machineInfo[i].name);
       SharkMQ_wrtstr(smq, "\",\"on\":");
-      SharkMQ_wrtstr(smq, getLedState(ledInfo[i].id)?"true":"false");
+      SharkMQ_wrtstr(smq, getGPIOState(machineInfo[i].id)?"true":"false");
       SharkMQ_wrtstr(smq, "}");
    }
 #ifdef ENABLE_TEMP
@@ -852,6 +752,9 @@ m2mled(SharkMQ* smq, SharkSslCon* scon,
    S16 temperature = (S16)getTemp(); /* current temperature */
 #endif
    char ipaddr[16];
+   char company[256] = "nocompany";
+   int check = 0;
+   strncpy(company, "nocompany", strlen("company"));
 
 /* We make it possible to override the URL at the command prompt when
  * in simulation mode.
@@ -908,10 +811,8 @@ m2mled(SharkMQ* smq, SharkSslCon* scon,
    setProgramStatus(ProgramStatus_DeviceReady);
 
    /* START OF CUSTOM PROJECT CODE */
-   const char* company = "nocompany";
    SharkMQ_create(smq,company);
    SharkMQ_subscribe(smq,"discovery");
-   int check = 0;
    smq->timeout=50;
    while(!check)
       {
@@ -930,14 +831,16 @@ m2mled(SharkMQ* smq, SharkSslCon* scon,
                   SharkMQ_wrtstr(smq, ipaddr);
                   SharkMQ_wrtstr(smq, "\",\"devname\":\"");
                   SharkMQ_wrtstr(smq, getDevName());
+                  SharkMQ_wrtstr(smq, "\",\"company\":\"");
+                  SharkMQ_wrtstr(smq, company);
 		  SharkMQ_wrtstr(smq, "\"}");
                   SharkMQ_pubflush(smq, nocompanyTid,0);
                   break;
                case SMQ_CREATESUBACK:
-                  /*xprintf("received invalud response, no createsubs are created here/n");*/
+                  /*xprintf("received invalid response, no createsubs are created here/n");*/
                   break;
                case SMQ_SUBCHANGE:
-                  /*xprintf("received invalud response, no connection checks are made here/n");*/
+                  /*xprintf("received invalid response, no connection checks are made here/n");*/
                   break;
                
                case SMQE_DISCONNECT: 
@@ -960,8 +863,7 @@ m2mled(SharkMQ* smq, SharkSslCon* scon,
       else if(result > 0)
       {
          if(smq->tid == smq->clientTid){
-            company = (char*)msg;
-            xprintf(("received company name %s\n",company));
+            strncpy(company, (char*)msg, strlen((char *)msg));
             check = 1;
             SharkMQ_unsubscribe(smq,discoveryTid);
          }
@@ -970,6 +872,8 @@ m2mled(SharkMQ* smq, SharkSslCon* scon,
             SharkMQ_wrtstr(smq, ipaddr);
             SharkMQ_wrtstr(smq, "\",\"devname\":\"");
             SharkMQ_wrtstr(smq, getDevName());
+            SharkMQ_wrtstr(smq, "\",\"company\":\"");
+            SharkMQ_wrtstr(smq, company);
             SharkMQ_wrtstr(smq, "\"}");
             SharkMQ_pubflush(smq, smq->ptid,0);
          }
@@ -983,9 +887,9 @@ m2mled(SharkMQ* smq, SharkSslCon* scon,
       {
          int x;
          int on;
-         if(setLedFromDevice(&x,&on))
+         if(setGPIOFromDevice(&x,&on))
          {
-            setLed(x,on);
+            setGPIO(x,on);
          }
 #ifdef ENABLE_TEMP
          x = getTemp();
@@ -1065,7 +969,7 @@ m2mled(SharkMQ* smq, SharkSslCon* scon,
                      info message.  All connected browsers will
                      receive this message and update their UI accordingly.
                   */
-                  sendDevInfo(smq, ipaddr, deviceTid, devInfoSubTid);
+                  sendDevInfo(smq, ipaddr, deviceTid, devInfoSubTid, company);
                }
                break;
 
@@ -1098,11 +1002,11 @@ m2mled(SharkMQ* smq, SharkSslCon* scon,
             /* Send device info to the new display unit: Send to
              * browser's ephemeral ID (ptid).
              */
-            sendDevInfo(smq, ipaddr, smq->ptid, devInfoSubTid);
+            sendDevInfo(smq, ipaddr, smq->ptid, devInfoSubTid, company);
          }
          else if(smq->tid == smq->clientTid) /* sent to our ephemeral tid */
          {
-            msg[1] = setLed(msg[0], msg[1]);
+            msg[1] = setGPIO(msg[0], msg[1]);
             if(msg[1] == -1)
             {
                xprintf(("ptid %X attempting to set invalid LED %d\n",
@@ -1125,13 +1029,13 @@ m2mled(SharkMQ* smq, SharkSslCon* scon,
       {
          int x; /* used for storing ledId and temperature */
          int on;
-         if(setLedFromDevice(&x,&on)) /* If a local button was pressed */
+         if(setGPIOFromDevice(&x,&on)) /* If a local button was pressed */
          {  /* Publish to all subscribed browsers and set the LED on/off */
             outData[0] = (U8)x; /* x is ledId */
             outData[1] = (U8)on;
             /* Publish to "/m2m/led/device", sub-topic "led" */
             SharkMQ_publish(smq, outData, 2, deviceTid, ledSubTid);
-            setLed(x, on); /* set the LED on/off */
+            setGPIO(x, on); /* set the LED on/off */
          }
 #ifdef ENABLE_TEMP
          x = getTemp();

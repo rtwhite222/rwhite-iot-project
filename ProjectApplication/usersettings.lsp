@@ -1,83 +1,97 @@
-<!DOCTYPE html>
+ <link href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.0/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
+<script src="//maxcdn.bootstrapcdn.com/bootstrap/3.3.0/js/bootstrap.min.js"></script>
+<script src="//code.jquery.com/jquery-1.11.1.min.js"></script>
+<!------ Include the above in your HEAD tag ---------->
 
-<?lsp
+<script src="https://use.fontawesome.com/1e803d693b.js"></script>
+ <nav class="navbar navbar-inverse">
+  <div class="container-fluid">
+    <div class="navbar-header">
+      <a class="navbar-brand" href="#">Othername</a>
+    </div>
+    <ul class="nav navbar-nav">
+      <li class="active"><a href="#">Devices</a></li>
+      <li><a href="#">Page 1</a></li>
+      <li><a href="#">Page 2</a></li><li><a href="#">Page 2</a></li><li><a href="#">Page 2</a></li>
+    </ul>
+    <ul class="nav navbar-nav navbar-right">
+      <li><a href="#"><span class="glyphicon glyphicon-user"></span> My Profile</a></li>
+      <li><a href="#"><span class="glyphicon glyphicon-log-in"></span> Log Out</a></li>
+    </ul>
+  </div>
+</nav> 
+<style>
+    .tab {
+    margin:auto;
+    border-radius: 5px;
+}
+.tabcontent {
 
-usersession = request:session()
-if not usersession then response:forward"login.lsp" end
-function checkLogin()
-    if not usersession.loggedin then
-        print "not logged in"
-        response:forward"login.lsp"
-    end
-end
-checkLogin()
+margin:auto;
+background:white;
+border-radius: 5px;
+}
+body {
+    background: linear-gradient(to right, rgba(128,128,128,1), rgba(128,128,128,0));
+}
 
-?>
-<html>
-    <head>
-        <meta charset="UTF-8"/>
-        <!--<style> 
-        div.collapse {
-            border: 5px solid;
-            border-radius: 15px 50px;
-            border-color:black;
-            padding-left: 2em;
-            background:black;
-            color:white;
-        }
-        ."btn btn-info" {
-            background:black
-            
-        }
-        </style>
-    -->
-        <meta name="viewport" content="width=device-width, initial-scale=1">
-        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
-        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
-        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
-        <title>User List</title>
-    </head>
-  
-    <body>
+</style>
+<div class="container" >
+    <div class="tab">
+        <button class="tablinks" onclick="openInfo(event, 'UserInfo')" id="defaultOpen">User Info</button>
+        <button class="tablinks" onclick="openInfo(event, 'ChangeSettings')">Edit User Settings</button>
+        <button class="tablinks" onclick="openInfo(event, 'UserLogs')">User Logs</button>
+    </div>
+
+<!-- Tab content -->
 <?lsp 
         local su=require"sqlutil"
         --local sql=string.format("username,companyname,PasswordExpiry,CompanyName,ContactNumber,Email,permissionlevel FROM users")
         usersession = request:session()
-        local sql = selectQueryWhere({"username","companyname","passwordexpiry","contactnumber","email","permissionlevel"},"users","username",usersession.loggedinas);
+        if not usersession then response:forward"login.lsp" end
+        function checkLogin()
+            if not usersession.loggedin then
+                print "not logged in"
+                response:forward"login.lsp"
+            end
+        end
+checkLogin()
+        local value = request:data().name
+        if value then
+        else
+            value = usersession.loggedinas
+        end
+        
+        local sql = selectQueryWhere({"username","companyname","passwordexpiry","contactnumber","email","permissionlevel"},"users","username",value);
         local function opendb() 
             return su.open"file" 
         end
 
-        local function exec(cur)
-            local username,companyname,passwordexpiry,contactnumber,email,permissionlevel = cur:fetch()
-
-                --local function execute(c2)
-                --    local = c2:fetch() 
-                    
-                --end
-                --local ok,err=su.select(opendb,string.format(sqlSelectUser), execute(c2))
-                
-                response:write("<div id='"..username.."'>"
-                    .."<h3>"
-                    .."Username: "..username.. "<br><br>"
-                    .."Password Expiry Date: "..passwordexpiry.."<br><br>"
-                    .."Related Company: "..companyname.."<br><br>"
-                    .."Contact Number: "..contactnumber.."<br><br>"
-                    .."Email Address: "..email.."<br><br>"
-                    .."Granted Permission Level: "..permissionlevel.."<br>"
-                    .."<br></h3></div>")
-               user,company,passwordexpiry,company,number,email,permissions = cur:fetch()
+        local function execute(cur)
+            local username,companyname,passwordexpiry,contactnumber,email,permissionlevel = cur:fetch()?>
+            
+            <div id="UserInfo" class="tabcontent">
+                <h3>
+                    Username: <?lsp=username?> <br><br>
+                    Password Expiry Date: <?lsp=passwordexpiry?> <br><br>
+                    Related Company: <?lsp=companyname?><br><br>
+                    Contact Number: <?lsp=contactnumber?><br><br>
+                    Email Address: <?lsp=email?><br><br>
+                    Granted Permission Level: <?lsp=permissionlevel?><br>
+                    <br></h3></div>
+                    <?lsp
             return true
      end
         
         
         
-        local ok,err=su.select(opendb,string.format(sql), exec)
+        local ok,err=su.select(opendb,string.format(sql), execute)
         
         
         ?>
-        
-        <form method="post">
+
+<div id="ChangeSettings" class="tabcontent">
+<form method="post">
 Name: <input type="text" name="username"><br>
 Password: <input type="password" name="password"><br>
 Confirm Password: <input type="password" name="passwordCheck"><br>
@@ -88,10 +102,7 @@ Company: <select name="companyName">
         local su=require"sqlutil"
         local sql=string.format("companyName FROM company")
         
-        local function execute(cur)
-            password = cur:fetch()
-            return true
-        end
+
         local function execute(cur)
         local company = cur:fetch()
         
@@ -119,9 +130,121 @@ Permission Level: <input type="text" name="permissionLevel"><br>
 <!-- <button type = "button" onClick = optionsPage() >Login</button> -->
 <button type="submit">Update User Settings</button>
 </form>
+</div>
 
-<pre style="background:red">
+<div id="UserLogs" class="tabcontent">
+  <?lsp
+  local su=require"sqlutil"
+        --local sql=string.format("username,companyname,PasswordExpiry,CompanyName,ContactNumber,Email,permissionlevel FROM users")
+        local sql = selectQueryWhere({"*"},"userlogs","username",usersession.loggedinas);
+        local function opendb() 
+            return su.open"file" 
+        end ?>
+        
+        <table>
+            <th>
+                user
+            </th>
+            <th>
+                time
+            </th>
+            <th>
+                action
+            </th>
+            
+        <?lsp
+        local function exec(cur)
+            local user,activitytime,action = cur:fetch()
+            while user do ?>
+                
+                <tr>
+                    <td> 
+                    <?lsp=user?>
+                    </td>
+                    <td> 
+                    <?lsp=(os.date("%c", activitytime))?> 
+                    </td>
+                    <td> <?lsp=action ?></td>
+                </tr>
+           
+            <?lsp
+               user,activitytime,action = cur:fetch()
+            end
+            --write("</div>")
+            return true
+        end
+
+     local ok,err=su.select(opendb,string.format(sql), exec)
+
+
+?>
+</table></div>
+</div> </div>
+<style>
+.tab {
+    overflow: hidden;
+    border: 1px solid #ccc;
+    background-color: #f1f1f1;
+}
+
+/* Style the buttons that are used to open the tab content */
+.tab button {
+    background-color: inherit;
+    float: left;
+    border: none;
+    outline: none;
+    cursor: pointer;
+    padding: 14px 16px;
+    transition: 0.3s;
+}
+
+/* Change background color of buttons on hover */
+.tab button:hover {
+    background-color: #ddd;
+}
+
+/* Create an active/current tablink class */
+.tab button.active {
+    background-color: #ccc;
+}
+
+/* Style the tab content */
+.tabcontent {
+    display: none;
+    padding: 6px 12px;
+    border: 1px solid #ccc;
+    border-top: none;
+height: 70%;
+overflow-y: auto;
+}</style>
+
+<script>
+    function openInfo(evt, tabName) {
+    // Declare all variables
+    var i, tabcontent, tablinks;
+
+    // Get all elements with class="tabcontent" and hide them
+    tabcontent = document.getElementsByClassName("tabcontent");
+    for (i = 0; i < tabcontent.length; i++) {
+        tabcontent[i].style.display = "none";
+    }
+
+
+    // Get all elements with class="tablinks" and remove the class "active"
+    tablinks = document.getElementsByClassName("tablinks");
+    for (i = 0; i < tablinks.length; i++) {
+        tablinks[i].className = tablinks[i].className.replace(" active", "");
+    }
+
+    // Show the current tab, and add an "active" class to the button that opened the tab
+    document.getElementById(tabName).style.display = "block";
+    evt.currentTarget.className += " active";
     
+    } 
+    document.getElementById("defaultOpen").click();
+</script>
+
+
 <?lsp -- START SERVER SIDE CODE
 
 
@@ -147,7 +270,3 @@ if request:method() == "POST" then
     --trace(value)
 end
 ?>
-<a href="options.lsp">Go back</a>
-        </body>
-</html>
-        

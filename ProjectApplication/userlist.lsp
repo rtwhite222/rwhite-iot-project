@@ -1,89 +1,115 @@
-<!DOCTYPE html>
-<?lsp
+<link href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.0/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
+<script src="//maxcdn.bootstrapcdn.com/bootstrap/3.3.0/js/bootstrap.min.js"></script>
+<script src="//code.jquery.com/jquery-1.11.1.min.js"></script>
+<!------ Include the above in your HEAD tag ---------->
 
-usersession = request:session()
-if not usersession then response:forward"login.lsp" end
-function checkLogin()
-    if not usersession.loggedin then
-        print "not logged in"
-        response:forward"login.lsp"
-    end
-end
-checkLogin()
+<script src="https://use.fontawesome.com/1e803d693b.js"></script>
+<style>form {
+    display: inline-block; //Or display: inline; 
+}
+tr:hover{
+    background-color: #ddd;
+    color: black;
+}
+input[type=text] {
+    float: right;
+    border: none;
+    margin-top: 8px;
+    margin-right: 16px;
+    font-size: 17px;
+    
+}
+.search-container {
+  float: right;
+}
 
-?>
-<html>
-    <head>
-        <meta charset="UTF-8"/>
-        <!--<style> 
-        div.collapse {
-            border: 5px solid;
-            border-radius: 15px 50px;
-            border-color:black;
-            padding-left: 2em;
-            background:black;
-            color:white;
-        }
-        ."btn btn-info" {
-            background:black
-            
-        }
-        </style>
-    -->
-        <meta name="viewport" content="width=device-width, initial-scale=1">
-        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
-        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
-        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
-        <title>User List</title>
-    </head>
-  
-    <body>
-        <div class="container">
-     <?lsp 
-        local su=require"sqlutil"
-        --local sql=string.format("username,companyname,PasswordExpiry,CompanyName,ContactNumber,Email,permissionlevel FROM users")
-        local sql = selectQuery({"username","companyname","passwordexpiry","companyname","contactnumber","email","permissionlevel"},"users");
-        local function opendb() 
-            return su.open"file" 
-        end
+.search-container input[type=submit] {
+  float: right;
+  margin-top: 8px;
+  margin-right: 16px;
+  background: #ddd;
+  font-size: 17px;
+  border: none;
+  cursor: pointer;
+}
 
-        local function exec(cur)
-            local user,company,passwordexpiry,company,number,email,permissions = cur:fetch()
-            while user do
+body {
+    background: linear-gradient(to right, rgba(128,128,128,.8), rgba(128,128,128,.3));
+}
+</style>
 
-                --local function execute(c2)
-                --    local = c2:fetch() 
-                    
-                --end
-                --local ok,err=su.select(opendb,string.format(sqlSelectUser), execute(c2))
-                
-                response:write("<button type='button' class='btn btn-info' data-toggle='collapse' data-target='#"..user.."'>"..user.." | "..company.."</button><br>")
-                response:write("<div id='"..user.."' class='collapse'>"
-                    .."<h3>"
-                    .."Username: "..user.. "<br><br>"
-                    .."Password Expiry Date: "..passwordexpiry.."<br><br>"
-                    .."Related Company: "..company.."<br><br>"
-                    .."Contact Number: "..number.."<br><br>"
-                    .."Email Address: "..email.."<br><br>"
-                    .."Granted Permission Level: "..permissions.."<br>"
-                    .."<br></h3></div>")
-                
-               user,company,passwordexpiry,company,number,email,permissions = cur:fetch()
-            end
-            return true
-     end
-        
-        
-        
-        local ok,err=su.select(opendb,string.format(sql), exec)
-        
-        
-        ?>
-  
-
-  
+ <div id="new-header">
+    <script>
+    $("#new-header").load("repeatfiles/header.html?version=9", function() {
+        $('#header-userList').addClass('active');
+    });
+    </script>
 </div>
-</select><br>
-<a href="options.lsp">Go back</a>
-  </body>
-</html>
+<div class="container">
+<div class="search-container">
+    <form action="/action_page.php">
+        <input type="text" name="name" placeholder = "Search for user">
+        <input type="submit" value = "Search"></button>
+    </form>
+    <form action="/action_page.php">
+        <input type="text" name="name" placeholder = "Search by Company">
+        <input type="submit" value = "Search"></button>
+    </form>
+    </div>
+	<div class="row">
+        <div class="panel panel-default user_panel">
+            <div class="panel-heading">
+                <h3 class="panel-title">User List</h3>
+            </div>
+            <div class="panel-body">
+				<div class="table-container">
+                    <table class="table-users table" border="0">
+                        <tbody>
+                        <?lsp 
+                        local su=require"sqlutil"
+                        local sql = selectQuery({"username","companyname","permissionlevel"},"users");
+                            
+                        local function opendb() 
+                            return su.open"file" 
+                        end
+                            
+                        local function exec(cur)
+                            local user,company,permissions = cur:fetch()
+                            while user do
+                                ?>
+                            <tr class='clickable-row' data-href='usersettings.lsp?name='<?lsp=user?>>
+                                <td width='10' align='center'>
+                                    <i class='fa fa-2x fa-user fw'></i>
+                                </td>
+                                <td>
+                                    <?lsp=user?> <br><i class='fa fa-envelope'></i>
+                                </td>
+                                <td>
+                                    <?lsp=permissions?> 
+                                </td>
+                                <td align='center'>
+                                    Last Login:  6/14/2017<br><small class='text-muted'>2 days ago</small>
+                                </td>
+                            </tr> 
+                                <?lsp
+                               user,company,permissions = cur:fetch()
+                            end
+                            return true
+                        end
+                        
+                        local ok,err=su.select(opendb,string.format(sql), exec)
+                        ?>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+	</div>
+</div>
+<script>
+jQuery(document).ready(function($) {
+    $(".clickable-row").click(function() {
+        window.location = $(this).data("href");
+    });
+});</script>

@@ -32,11 +32,11 @@ local su=require"sqlutil"
                 --local ok,err=su.select(opendb,string.format(sqlSelectUser), execute(c2))
                 
 
-                
-                response:write("<tr>"
-                    .."<td>".. user .." </td><td>"..(os.date("%c", activitytime)) .." </td><td>"..action.."</td>"
-                    .."</tr>")
-                
+                ?>
+                <tr>
+                    <td> <?lsp=user?> </td><td> <?lsp=(os.date("%c", activitytime))?> </td><td>" <?lsp=action ?>"</td>
+                </tr>
+            <?lsp
                user,activitytime,action = cur:fetch()
             end
             response:write("</table>")

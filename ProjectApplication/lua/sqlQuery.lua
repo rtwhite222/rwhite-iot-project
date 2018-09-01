@@ -27,12 +27,12 @@ function selectQuery(getValues,SQLtable)
 end
 -- Function to create string to be input as SQL select
 
-function updateQueryWhere(getValues,SQLtable, attribute, entity)
+function updateQueryWhere(getValues,SQLtable, compareValue, compareCheck)
     local sql = "UPDATE " .. SQLtable .. " SET "
     local checked = false
     
     for name, value in pairs(getValues) do
-        trace(value)
+        --trace(value)
         if not (value == "") then
             if not checked then
                 sql = sql .. name .. " = '" .. value .. "'" 
@@ -42,7 +42,29 @@ function updateQueryWhere(getValues,SQLtable, attribute, entity)
             end
         end
     end
-    sql = sql .. " WHERE " .. attribute .. " = '" .. entity .. "';"
+    sql = sql .. " WHERE " .. compareValue .. " = '" .. compareCheck .. "';"
     return sql
 end
 -- Function to create string to be input as SQL update. Used to change values of already created entities
+
+function deleteQueryWhere(SQLtable, attribute, entity)
+    local sql = "DELETE FROM " .. SQLtable .. " WHERE " .. attribute .. " = '" .. entity .. "';"
+    return sql
+end
+
+function insertQuery(getValues,SQLtable)
+    local sql = "INSERT INTO " .. SQLtable .. "("
+    local checked = false
+    for name, value in pairs(getValues) do
+        if not checked then
+            sql = sql .. name 
+            sqlvalues = "'"..value.."'"
+            checked = true
+        else
+            sql = sql .. ", " .. name
+            sqlvalues = sqlvalues .. ", '" .. value .. "'"
+        end
+    end
+    sql = sql .. ") VALUES (" .. sqlvalues .. ");"
+    return sql
+end

@@ -4,34 +4,75 @@
             <meta charset="UTF-8"/>
             <meta name="viewport" content="width=device-width, height=device-height, initial-scale=1">
             <title>Login Page</title>
-            <link rel="stylesheet" href="cssfiles/button.css?version=3">
+
             <link rel="stylesheet" href="cssfiles/inputForms.css?version=3">
             
         </head>
-    <body>
-        
-        <style>
-            input{
-                width: 90%;
-                padding:2px 2px;
-            }
+<style>body{
+    display: block;
+    color: lightgrey;
+}
+.center-div
+{
+  position: absolute;
+  margin: auto;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  width: 60%;
+  height: 450px;
+  background-color: White;
+  border-radius: 5px;
+  text-align: center;
+  box-shadow: 5px 5px 5px grey;
+}
+input[type=text] {
+    width: 50%;
+    border: 2px solid;
+    border-color:red;
+    font-size: 17px;
+}
+input[type=password] {
+    width: 50%;
+    border: 2px solid;
+    border-color:red;
+    font-size: 17px;
+}
+input[type=submit] {
+    width:100px;
+    font-size: 25px;
+    box-shadow: 1px 1px 5px grey;
+}
+body {
+    background: linear-gradient(to right, rgba(128,128,128,1), rgba(128,128,128,0));
+}
+h2 {
+    font-family: Tahoma, Geneva, sans-serif;
+}
 
-        </style>
+</style>
 
-<form method="post">
-Name:
-<br><input type="text" name="name" autofocus required><br>
-Password: 
-<br><input type="password" name="password" required><br>
+<div class="center-div">
+    <form method="post">
+        <br>
+<h2 align = "center">Name:</h2>
+<input type="text" name="name" placeholder="Enter username" autocomplete="nope" autofocus required><br>
+<h2 align = "center">Password:</h2>
+<input type="password" name="password" placeholder="Enter password"  required><br><br><br>
 <!-- <button type = "button" onClick = optionsPage() >Login</button> -->
 <input type="submit" value = "Login">
 </form>
-
+</div>
     
 <?lsp -- START SERVER SIDE CODE
-response:write('<pre style="background:red">')
+
 usersession = request:session(true) -- Creates user session (persistent 
-usersession.loggedin = false
+if not usersession.loggedin then 
+    usersession.loggedin = false
+    usersession:maxinactiveinterval(300)
+end
+--if usersession.loggedin == true then response:forward"options.lsp" end
 if not usersession.lockoutuntil then usersession.lockoutuntil = 0 end
 if request:method() == "POST" and (os.time()>(usersession.lockoutuntil or 0)) then
     
@@ -61,9 +102,26 @@ if request:method() == "POST" and (os.time()>(usersession.lockoutuntil or 0)) th
        if (--luaTable.name == "root" and 
            luaTable.password == password) then
             --loginattempt:terminate()
-            usersession.loggedin = true
-            usersession.loggedinas = luaTable.name
-            usersession.loginattempts = 0
+            usersession.loggedin = true;
+            usersession.loggedinas = luaTable.name;
+            usersession.loginattempts = 0;
+            local sql = selectQueryWhere({"CompanyName"},"users","username",luaTable.name);
+        
+            local function execute(cur)
+                company = cur:fetch();
+                return true;
+            end
+            
+            local function opendb() 
+                return su.open("file");
+            end
+            
+            local ok,err=su.select(opendb,string.format(sql), execute);
+            usersession.company=company;
+            trace(usersession.company)
+            if not ok then 
+                response:write("DB err: "..err) 
+            end
             
              local sql= "INSERT INTO userlogs VALUES('"..luaTable.name.."','"..os.time().."','User Login');"
             local env,conn = su.open"file"
@@ -74,7 +132,7 @@ if request:method() == "POST" and (os.time()>(usersession.lockoutuntil or 0)) th
             response:write("DB err: "..err) 
         end
         --if ok then
-           response:forward"options.lsp"
+           response:forward"devicelist.lsp"
             
             
             --loginattempt.counter = 999

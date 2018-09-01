@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-
+ 
 <?lsp
 
 usersession = request:session()
@@ -16,14 +16,247 @@ checkLogin()
 
 <html>
 <head>
+    <script type="text/javascript" src="https://canvasjs.com/assets/script/canvasjs.min.js"></script>
+    <link href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.0/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
+<!--<script src="//maxcdn.bootstrapcdn.com/bootstrap/3.3.0/js/bootstrap.min.js"></script>
+<script src="//code.jquery.com/jquery-1.11.1.min.js"></script>
+- - - - - Include the above in your HEAD tag - - - - - - - -
+
+<script src="https://use.fontawesome.com/1e803d693b.js"></script>-->
+<style>
+form {
+    display: inline-block; //Or display: inline; 
+}
+
+
+.search-container {
+  float: right;
+}
+.search-container input[type=submit] {
+  float: right;
+  margin-top: 8px;
+  margin-right: 16px;
+  background: #ddd;
+  font-size: 17px;
+  border: none;
+  cursor: pointer;
+}
+body {
+    background: linear-gradient(to right, rgba(128,128,128,1), rgba(128,128,128,0));
+}
+
+
+form {
+    display: inline-block; //Or display: inline; 
+}
+
+.clickable-row:hover{
+    background-color: #ddd;
+    color: black;
+}
+
+
+
+.search-container input[type=submit] {
+  float: right;
+  margin-top: 8px;
+  margin-right: 16px;
+  background: #ddd;
+  font-size: 17px;
+  border: none;
+  cursor: pointer;
+}
+
+body {
+    background: linear-gradient(to right, rgba(128,128,128,1), rgba(128,128,128,0));
+}
+
+.header-div{
+position: absolute;
+    float:left;
+    display:inline;
+     margin-left: 10px;
+     margin-top: 8px;
+     font-size: 25px;
+}
+.tab {
+    overflow: hidden;
+    border: 1px solid #ccc;
+    background-color: #f1f1f1;
+    margin:auto;
+    border-radius: 5px;
+}
+
+/* Style the buttons that are used to open the tab content */
+.tablinks {
+    background-color: inherit;
+    float: left;
+    border: none;
+    outline: none;
+    cursor: pointer;
+    padding: 14px 16px;
+    transition: 0.3s;
+
+}
+
+.backtab {
+    display:inline-block;
+    background-color: black;
+    float: right;
+    color:white;
+    font-size: 15px;
+    
+}
+
+/* Change background color of buttons on hover */
+.tablinks:hover {
+    background-color: #ddd;
+    color:black;
+}
+
+/* Create an active/current tablink class */
+.tablinks.active {
+    background-color: #ccc;
+}
+
+/* Style the tab content */
+.tabcontent {
+    display: none;
+    padding: 6px 12px;
+    border: 1px solid #ccc;
+    border-top: none;
+    margin:auto;
+    background:white;
+    border-radius: 5px;
+    max-height: 70vh;
+    overflow-y:auto;
+    position:relative;
+}
+.device-reading-container {
+    border-style:solid;
+    padding-left: 30px;
+    padding-bottom: 10px;
+    -webkit-border-image: 
+        -webkit-linear-gradient(left, rgba(255,255,255,1) 1%,rgba(0,0,0,1) 50%,rgba(255,255,255,1) 100%) 0 0 100% 0/0 0 5px 0 stretch;
+           @media (max-width: 480px){float:left;}
+}
+.readout-container {
+    padding-left: 50px;
+    padding-top: 20px;
+    float:left;
+}
+.device-reading {
+padding-top:10px;
+padding-bottom:15px;
+}
+.device-gpio-container{
+    float:left;
+    display: inline-block;
+    padding-left: 30px;
+    padding-top: 10px;
+    padding-right:30px;
+}
+
+.right-align-span{
+    float:right;
+    padding-right:10px;
+}
+
+
+.onoffswitch {
+    position: relative; width: 72px;
+    -webkit-user-select:none; -moz-user-select:none; -ms-user-select: none;
+}
+.onoffswitch-checkbox {
+    display: none;
+}
+.onoffswitch-label {
+    display: block; overflow: hidden; cursor: pointer;
+    border: 2px solid #999999; border-radius: 23px;
+}
+.onoffswitch-inner {
+    display: block; width: 200%; margin-left: -100%;
+    -moz-transition: margin 0.3s ease-in 0s; -webkit-transition: margin 0.3s ease-in 0s;
+    -o-transition: margin 0.3s ease-in 0s; transition: margin 0.3s ease-in 0s;
+}
+.onoffswitch-inner:before, .onoffswitch-inner:after {
+    display: block; float: left; width: 50%; height: 23px; padding: 0; line-height: 23px;
+    font-size: 14px; color: white; font-family: Trebuchet, Arial, sans-serif; font-weight: bold;
+    -moz-box-sizing: border-box; -webkit-box-sizing: border-box; box-sizing: border-box;
+    border-radius: 23px;
+    box-shadow: 0px 11.5px 0px rgba(0,0,0,0.08) inset;
+}
+.onoffswitch-inner:before {
+    content: "ON";
+    padding-left: 10px;
+    background-color: #933C00; color: #FFFFFF;
+    border-radius: 23px 0 0 23px;
+}
+.onoffswitch-inner:after {
+    content: "OFF";
+    padding-right: 10px;
+    background-color: #000000; color: #FFFFFF;
+    text-align: right;
+    border-radius: 0 23px 23px 0;
+}
+.onoffswitch-switch {
+    display: block; width: 23px; margin: 0px;
+    background: #FFFFFF;
+    border: 2px solid #999999; border-radius: 23px;
+    position: absolute; top: 0; bottom: 0; right: 45px;
+    -moz-transition: all 0.3s ease-in 0s; -webkit-transition: all 0.3s ease-in 0s;
+    -o-transition: all 0.3s ease-in 0s; transition: all 0.3s ease-in 0s; 
+    background-image: -moz-linear-gradient(center top, rgba(0,0,0,0.1) 0%, rgba(0,0,0,0) 80%); 
+    background-image: -webkit-linear-gradient(center top, rgba(0,0,0,0.1) 0%, rgba(0,0,0,0) 80%); 
+    background-image: -o-linear-gradient(center top, rgba(0,0,0,0.1) 0%, rgba(0,0,0,0) 80%); 
+    background-image: linear-gradient(center top, rgba(0,0,0,0.1) 0%, rgba(0,0,0,0) 80%);
+    box-shadow: 0 1px 1px white inset;
+}
+.onoffswitch-checkbox:checked + .onoffswitch-label .onoffswitch-inner {
+    margin-left: 0;
+}
+.onoffswitch-checkbox:checked + .onoffswitch-label .onoffswitch-switch {
+    right: 0px; 
+}
+.led, .led-off {
+margin:20px;
+    width: 25px;
+    height: 25px;
+    border-radius: 50%;
+}
+
+
+.led {
+    background-color: #690;
+    box-shadow: #000 0 -1px 7px 1px, inset #460 0 -1px 9px, #7D0 0 2px 12px;
+}
+
+
+.led-off {
+    background-color: gray;
+    box-shadow: #000 0 -1px 7px 1px, inset #4B4B4B 0 -1px 9px, #878787 0 2px 14px;
+}
+
+.red-warning {
+color:red;
+}
+.white-warning {
+color:white;
+}
+.setting-inputs{
+background-color:black;
+}
+
+
+
+</style>
 <meta charset="UTF-8" />
 <title>Devices Page</title>
 <meta name=viewport content="width=device-width, initial-scale=1" />
-<link rel="stylesheet" type="text/css" href="style.css"/>
 
-<script src="/rtl/jquery.js"></script>
+
 <script src="/rtl/smq.js"></script>
-<script src="txt2link.js"></script>
+<script src="/rtl/jquery.js"></script>
 <script>
 
 function escapeHtml(unsafe) {
@@ -36,30 +269,21 @@ function escapeHtml(unsafe) {
 };
 
 
-/* Each LED is wrapped in a Table Row (TR) element (Ref-TR). Each TR
-   element contains 3 TD elements and the 3 'mk..' (for make) functions
-   below create the HTML that goes into these 3 TD elements.
-*/
+function getCompany(){
+    var company = "<?lsp=usersession.company?>"
+return company
+};
 
-/* TD 1: the LED name */
+/////////////////////////////////////////////MAKE LEDS ////////////////////////////////
 function mkLedName(name) {
     return '<td>'+name+'</td>';
 }
 
-/* TD 2: the LED is simply a DIV element styled by using the CSS from
-   the following page: http://cssdeck.com/labs/css-leds
-*/
 function mkLed(ptid,ledId,color,on) {
-    return '<td><div id="led-'+ptid+ledId+'" class="led-'+
-        color+(on ? '' : ' led-off')+'"></div></td>';
+    return '<td><div id="led-'+ptid+ledId+'" class="led'+
+        (on ? '' : ' led-off')+'"></div></td>';
 }
 
-
-/* TD 3: the LED on/off switch is a standard HTML checkbox that is
-   styled using CSS3 and by using CSS3 transformation. We used the
-   on/off FlipSwitch generator on the following page for generating
-   the CSS: https://proto.io/freebies/onoff/
-*/
 function mkLedSwitch(ptid,ledId,on) {
     var x =
         '<td>'+
@@ -72,61 +296,84 @@ function mkLedSwitch(ptid,ledId,on) {
         '</label>'+
         '</div>'+
         '</td>';
+        
     return x;
 }
 
-/* temp is in celcius x 10 */
 function temp2html(temp) {
     temp /= 10;
     return "Temperature: " + temp + "  &#x2103; <span>(" + 
-        Math.round(temp*9/5+32) + " &#x2109;)</span>";
+        Math.round(temp*9/5+32) + " &#x2109; )</span>";
+}
+function torque2html(torque) {
+    return "Torque: " + torque + " N \u22C5 m "
+}
+function runtime2html(runtime) {
+    return "Run time left: " + runtime
+}
+function size2html(size) {
+    return "Paint tin size: " + size;
 }
 
-
-/* The div with ID 'nodev' is used for displaying information when no
-   devices are connected.
-*/
 function printNoDevs() {
-    $("#nodev").html('<h2>There are currently no devices connected</h2>').show();
+    $("#nodev").html('<h2 align="center">There are currently no devices connected</h2>').show();
+};
+
+
+
+
+function errorResolve(ipaddr, errorTimes,ptid) {
+$.ajax({
+        type: "POST",
+        url: "deviceerrorupdate.lsp",
+        data: {deviceIP: escapeHtml(ipaddr), errorTime: errorTimes},
+        success: function(output) {
+            $("#row-"+errorTimes+ptid).remove();
+            errorCount(ipaddr,ptid)
+        }
+    });
+} 
+
+function errorCount(ipaddr,ptid){
+
+    $.ajax({
+        
+        type: "POST",
+        url: "deviceerrorcount.lsp",
+        data: {deviceIP: escapeHtml(ipaddr)},
+        success: function(output) {
+            if(output > 0){
+                $('#device-warning-'+ptid).removeClass("white-warning").addClass("red-warning");
+            }
+            else{
+                $('#device-warning-'+ptid).removeClass("red-warning").addClass("white-warning");
+                $("#deviceLogs-"+ptid).html("This device has no unresolved errors");
+            }
+        }
+    });
+
 }
-
-
-/* The complete LED manager is created in this function when JQuery
-   calls our anonymous function at startup.
-*/
 $(function() {
     var connectedDevs=0;
+    
     if(window.location.search.search("nointro") == 1) {
         $("#dev-0").hide();
         $("#nav-0").hide();
     }
 
-    /* Check if the browser supports WebSockets */
     if(! SMQ.websocket() ) {
         $('#nodev').html('<h2>Please update your browser or install one which supports websockets</h2>');
         return; /* Stop: no support */
     }
 
-    // Create a SimpleMQ instance and connect to the broker.
     var smq = SMQ.Client(SMQ.wsURL("/Server-Broker-Test8/"));
 
-    /* We use the onmsg as a "catch all" for non managed messages we
-       receive. This function should not be called since we install
-       callbacks for all subscribed events. The onmsg is typically
-       used for error checking during development.
-    */
     smq.onmsg=function(data,ptid,tid,subtid) {
         console.log("Received unexpected data:", data,", from",ptid,", tid=",tid,
                     ", subtid=",subtid);
         console.log("  data string:",SMQ.utf8.decode(data))
     };
 
-    /* The disconnect callback function removes all devices and
-       LEDS. A disconnect message is shown. The function instructs the
-       SimpleMQ client stack to attempt to reconnect after 3
-       seconds. This function will be called repeatedly if the
-       SimpleMQ client stack is unable to reconnect.
-     */
     smq.onclose=function(message,canreconnect) {
         connectedDevs=0;
         $("#nav").empty();
@@ -135,69 +382,216 @@ $(function() {
         if(canreconnect) return 3000;
     };
 
-
-    /* We redirect the onconnect event to our function for printing
-       "no devices connected". The function replaces the initial
-       "Connecting..." message.
-     */
     smq.onconnect=printNoDevs();
 
-    /* Called after a disconnect (smq.onclose) and after a re-connect
-       attempt succeeded.
-       Re-discover all devices by publishing a "hello" message to the
-       "/m2m/led/display" topic. The devices will then respond by
-       publishing the devices capabilities to our ephemeral topic ID.
-    */
     smq.onreconnect=function() {
-        //Broadcast to all connected devices.
-        //Device will then send info to our ptid ("self"), sub-tid: "devinfo".
         printNoDevs(); // State "not connected" to "no devices"
-        smq.publish("Hello", "/m2m/led/display");
+        smq.publish("Hello", "nocompany");////////////////////////////////////////////////////////////////////////////////
     };
+    
 
-    /* Function devInfo is installed as a SimpleMQ callback for the
-       events we receive on the [topic "self" and sub topic "devinfo"]
-       and on the [topic "/m2m/led/display" and sub topic
-       "devinfo"]. The function creates the HTML for the device based
-       on the capabilities presented in the info object. The info
-       object is the parsed JSON received from the device.
-    */
     function devInfo(info, ptid) {
-        /* HTML for device information (displayed at top). We give the
-         DIV the ID "dev-'+ptid+'". The ID is used when we install
-         click event callbacks for the on/off switches (Ref-switch).
-        */
+    info.company = "nil"
+        var html=        
+        ("<tr class='clickable-row' id = 'device-"+ptid+"' data-href='usersettings.lsp'>"+
+            "<td width='10' align='center'>"+
+                "<i class='fa fa-2x fa-warning fw white-warning' id='device-warning-"+ptid+"'></i>"+   
+            "</td>"+
+            "<td>"+
+                escapeHtml(info.devname)+"<br>"+
+            "</td>"+
+            "<td>"+
+                escapeHtml(info.ipaddr)+
+            "</td>"+
+            "<td align='center'>"+
+                "Product registered to:<br><small class='text-muted'>"+escapeHtml(info.company)+"</small>"+
+
+        "</tr> ");
         
-        var html='<div id="dev-'+ptid+'"><span>'+(escapeHtml(info.devname))+'</span><div>';
-        if(typeof info.temp != 'undefined') {
-            html+='<div class="temperature" id="temp-'+ptid+'">'+temp2html(info.temp)+'</div>'
-        }
-        html += '</div><table>'
+        $("#devicesList").append(html);
+        
+        errorCount(info.ipaddr,ptid)
+        
+                var tablisthtml=        
+            ('<div class="tab" id = "deviceContents-'+ptid+'">'+
+                '<button class="tablinks active" id ="deviceInfoTab-'+ptid+'">Device Info</button>'+
+                '<button class="tablinks" id ="deviceStatisticsTab-'+ptid+'">Device Statistics</button>'+
+                '<button class="tablinks" id ="deviceRunParamsTab-'+ptid+'">Device Parameters</button>'+
+                '<button class="tablinks" id ="deviceLogsTab-'+ptid+'">Error Logs</button>'+
+                '<button class="tablinks backtab" id ="backtab-'+ptid+'">Go back</button>'+
+            '</div>'+
+            '<div id="deviceInfo-'+ptid+'" class="tabcontent">'+
+            '</div>'+
+            '<div id="deviceStatistics-'+ptid+'" class="tabcontent">'+
+            '</div>'+
+            '<div id="deviceRunParams-'+ptid+'" class="tabcontent">'+
+            '</div>'+
+            '<div id="deviceLogs-'+ptid+'" class="tabcontent">'+
+            '</div>')
+        $("#deviceSettingInjection").append(tablisthtml);
+        
+        
+        
+        $("#deviceContents-"+ptid).hide();
+        
+        $("#deviceInfoTab-"+ptid).click(function(ev) {
+            $("#deviceInfo-"+ptid).show();
+            $("#deviceStatistics-"+ptid).hide();
+            $("#deviceRunParams-"+ptid).hide();
+            $("#deviceLogs-"+ptid).hide();
+            $("#deviceInfoTab-"+ptid).removeClass("").addClass("active");
+            $("#deviceStatisticsTab-"+ptid).removeClass("active").addClass("");
+            $("#deviceRunParamsTab-"+ptid).removeClass("active").addClass("");
+            $("#deviceLogsTab-"+ptid).removeClass("active").addClass("");
+            
+        });
+        
+        $("#deviceStatisticsTab-"+ptid).click(function(ev) {
+
+        
+            $("#deviceInfo-"+ptid).hide();
+            $("#deviceStatistics-"+ptid).show();
+            $("#deviceRunParams-"+ptid).hide();            
+            $("#deviceLogs-"+ptid).hide();
+            $("#deviceInfoTab-"+ptid).removeClass("active").addClass("");
+            $("#deviceStatisticsTab-"+ptid).removeClass("").addClass("active");
+            $("#deviceRunParamsTab-"+ptid).removeClass("active").addClass("");
+            $("#deviceLogsTab-"+ptid).removeClass("active").addClass("");
+        });
+        
+        $("#deviceLogsTab-"+ptid).click(function(ev) {
+            $("#deviceInfo-"+ptid).hide();
+            $("#deviceStatistics-"+ptid).hide();
+            $("#deviceRunParams-"+ptid).hide();
+            $("#deviceLogs-"+ptid).show();
+            $("#deviceInfoTab-"+ptid).removeClass("active").addClass("");
+            $("#deviceStatisticsTab-"+ptid).removeClass("active").addClass("");
+            $("#deviceRunParamsTab-"+ptid).removeClass("active").addClass("");
+            $("#deviceLogsTab-"+ptid).removeClass("").addClass("active");
+            
+
+                $.ajax({
+              type: "POST",
+              url: "deviceerrors.lsp",
+              data: {deviceIP: escapeHtml(info.ipaddr), ptid: ptid},
+              //data: {graphinfo: "2"},
+            success: function(output) {
+                  $("#deviceLogs-"+ptid).html(output);
+                  //renderchart();
+              }
+            });
+            
+        $('#deviceLogs-'+ptid+' :checkbox').click(function(ev) {
+
+            alert("#smallRunTime"+ptid)
+        });
+
+        });
+        
+        $("#deviceRunParamsTab-"+ptid).click(function(ev) {
+            $("#deviceInfo-"+ptid).hide();
+            $("#deviceStatistics-"+ptid).hide();
+            $("#deviceRunParams-"+ptid).show();
+            $("#deviceLogs-"+ptid).hide();
+            $("#deviceInfoTab-"+ptid).removeClass("active").addClass("");
+            $("#deviceStatisticsTab-"+ptid).removeClass("active").addClass("");
+            $("#deviceRunParamsTab-"+ptid).removeClass("").addClass("active");
+            $("#deviceLogsTab-"+ptid).removeClass("active").addClass("");
+        });
+        
+        $("#device-"+ptid).click(function(ev) {
+            $("#devicesListContainer").hide();
+            $("#deviceContents-"+ptid).show();
+            $("#deviceInfo-"+ptid).show();
+        });
+        
+        $("#backtab-"+ptid).click(function(ev) {
+            $("#devicesListContainer").show();
+            $("#deviceContents-"+ptid).hide();
+            $("#deviceInfo-"+ptid).hide();
+            $("#deviceStatistics-"+ptid).hide();
+            $("#deviceRunParams-"+ptid).hide();
+            $("#deviceLogs-"+ptid).hide();
+            
+        });
+        
+        
+        var devicetabhtml='<div id="dev-'+ptid+'">'; 
+        devicetabhtml+='<div class="device-reading-container"><h1>'+(escapeHtml(info.devname))+'<span class ="right-align-span">'+escapeHtml(info.ipaddr)+'<span></h1></div>'
+        devicetabhtml += '<div class ="device-gpio-container"><table>';
         //Loop over all LEDS and create a TR element for each LED (Ref-TR)
         var leds=info.leds;
         for(var i=0 ; i < leds.length; i++) {
             // TR contains: TD for name + TD for LED + TD for LED on/off switch
-            html += ('<tr>' +
-                     mkLedName(leds[i].name) +
-                     mkLed(ptid, leds[i].id, leds[i].color,leds[i].on) +
-                     mkLedSwitch(ptid, leds[i].id, leds[i].on) +
-                     '</tr>');
+            devicetabhtml += 
+                            ('<tr>' + mkLedName(leds[i].name) + 
+                                mkLed(ptid, leds[i].id, leds[i].color,leds[i].on) +
+                                mkLedSwitch(ptid, leds[i].id, leds[i].on) +
+                            '</tr>');
         }
-        html += '<form method="post"><input type="submit" value = "remove this device"></form>';html += '</table></div>';
-        //Add the complete HTML for this device to the "devices" DIV element
+       devicetabhtml += '</table></div>';
+         //Add the complete HTML for this device to the "devices" DIV element
+         info.torque = 0;
+         info.runtime = 0;
+         info.size = "None";
+        
 
-        $("#devices").append(html);
-
-        /* Install a 'clickCallback' function for each checkbox
-           (on/off switch) element in our new HTML for this device
-           (Ref-switch).
-           The callback, which is explained in the online tutorial,
-           extracts the publisher's ephemeral topic id (ptid) and the
-           LED ID from the information embedded in the HTML. We then
-           create a two byte binary packet for sending the LedId and
-           the button's on/off state to the device. Publishing to the
-           "ptid" sends a message to the device.
-        */
+        devicetabhtml+= '<div class = "readout-container" >'
+            devicetabhtml+='<div class="device-reading" id="temp-'+ptid+'">'+temp2html(info.temp)+'</div><br>'
+            devicetabhtml+='<div class="device-reading" id="torque-'+ptid+'">'+torque2html(info.torque)+'</div><br>'
+            devicetabhtml+='<div class="device-reading" id="runtime-'+ptid+'">'+runtime2html(info.runtime)+'</div><br>'
+            devicetabhtml+='<div class="device-reading" id="size-'+ptid+'">'+size2html(info.size)+'</div><br>'
+        devicetabhtml+= '</div>'
+        devicetabhtml+= '</div>';
+        $("#deviceInfo-"+ptid).append(devicetabhtml);
+        
+        devicetabhtml = '<div class = "setting-inputs">';
+        devicetabhtml +='<div><input type="text" value="test" id = "smallRunTime'+ptid+'">';
+        devicetabhtml +='<button class="submit-btn" type = "submit" id = "smallRunTimeSub'+ptid+'">Set Run Duration</button>';
+        
+        devicetabhtml += '<input type="text" value="test" id = "smallRunSpeed'+ptid+'">';
+        devicetabhtml +='<button class="submit-btn" type = "submit" id = "smallRunSpeedSub'+ptid+'">Set Run Speed</button></div>';
+        
+        devicetabhtml +='<div><input type="text" value="test" id = "medRunTime'+ptid+'">';
+        devicetabhtml +='<button class="submit-btn" type = "submit" id = "medRunTimeSub'+ptid+'">Set Run Duration</button>';
+        
+        devicetabhtml += '<input type="text" value="test" id = "medRunSpeed'+ptid+'">';
+        devicetabhtml +='<button class="submit-btn" type = "submit" id = "medRunSpeedSub'+ptid+'">Set Run Speed</button></div>';
+        
+        devicetabhtml +='<div><input type="text" value="test" id = "largeRunTime'+ptid+'">';
+        devicetabhtml +='<button class="submit-btn" type = "submit" id = "largeRunTimeSub'+ptid+'">Set Run Duration</button>';
+        
+        devicetabhtml += '<input type="text" value="test" id = "largeRunSpeed'+ptid+'">';
+        devicetabhtml +='<button class="submit-btn" type = "submit" id = "largeRunSpeedSub'+ptid+'">Set Run Speed</button></div>';
+        
+        devicetabhtml +='<button class="submit-btn" type = "submit" id = "removeDevice'+ptid+'">Remove Device</button>';
+        devicetabhtml +='</div>';
+        $("#deviceRunParams-"+ptid).append(devicetabhtml);
+        
+        $("#smallRunSpeedSub"+ptid).click(function(ev) {
+            smq.publish($("#smallRunSpeed"+ptid).val()+"\0",ptid,"smallSpeed");
+            alert($("#smallRunSpeed"+ptid).val())
+        });
+        $("#smallRunTimeSub"+ptid).click(function(ev) {
+            smq.publish($("#smallRunTime"+ptid).val()+"\0",ptid,"smallTime");
+            alert($("#smallRunTime"+ptid).val())
+        });
+        $("#medRunSpeedSub"+ptid).click(function(ev) {
+            smq.publish($("#medRunSpeed"+ptid).val()+"\0",ptid,"medSpeed");
+            alert($("#medRunSpeed"+ptid).val())
+        });
+        $("#medRunTimeSub"+ptid).click(function(ev) {
+            smq.publish($("#medRunTime"+ptid).val()+"\0",ptid,"medTime");
+            alert($("#medRunTime"+ptid).val())
+        });
+        $("#largeRunSpeedSub"+ptid).click(function(ev) {
+            smq.publish($("#largeRunSpeed"+ptid).val()+"\0",ptid,"largeSpeed");
+            alert($("#largeRunSpeed"+ptid).val())
+        });
+        $("#largeRunTimeSub"+ptid).click(function(ev) {
+            smq.publish($("#largeRunTime"+ptid).val()+"\0",ptid,"largeTime");
+            alert($("#largeRunTime"+ptid).val())
+        });
         $('#dev-'+ptid+' :checkbox').click(function(ev) {
             var id = $(this).prop('id').match(/(\d+)-(\d+)/);
             var ptid = parseInt(id[1]);
@@ -206,51 +600,69 @@ $(function() {
             data[0] = ledId;
             data[1] = this.checked ? 1 : 0;
             smq.publish(data,ptid);
+            alert("#smallRunTime"+ptid)
+        });
+        
+        $("#removeDevice"+ptid).click(function(ev) {
+            $.ajax({
+              type: "POST",
+              url: "removedevicecode.lsp",
+              data: {deviceIP:info.ipaddr},
+            success: function(output) {
+                  alert(output);
+                  if(--connectedDevs == 0)
+                printNoDevs();
+              }
+            });
             
         });
-
-        /* Install a "change event" callback for the publisher's
-           ephemeral topic ID (ptid). Receiving a change event for a
-           ptid means the device disconnected. See the SimpleMQ
-           documentation for details on "change events".
-         */
+        
+        devicetabhtml ='<div><input type="text" value="test" id = "deviceRunSelect'+ptid+'">';
+        devicetabhtml +='<button class="submit-btn" type = "submit" id = "deviceRunSelectbtn'+ptid+'">View Readings</button></div>';
+        devicetabhtml+= '<div id = "deviceStatisticsGraph-'+ptid+'">NO GRAPH DISPLAYED</div>';
+        $("#deviceStatistics-"+ptid).html(devicetabhtml);
+        $("#deviceRunSelectbtn"+ptid).click(function(ev) {
+                    //////////////////////////////////////////
+                $.ajax({
+              type: "POST",
+              url: "graphload.lsp",
+              data: {deviceIP: escapeHtml(info.ipaddr), timeofrun: $("#deviceRunSelect"+ptid).val()},
+              //data: {graphinfo: "2"},
+            success: function(output) {
+                  $("#deviceStatisticsGraph-"+ptid).html(output);
+                  //renderchart();
+              }
+            });
+        ///////////////////////////////////////////
+        });
+        
         smq.observe(ptid, function() {
-            $('#dev-'+ptid).remove(); /* Remove HTML for this device */
-            $('#nav-'+ptid).remove(); /* Remove the tab in the left pane */
+            $('#dev-'+ptid).remove();
+            $('#device-'+ptid).remove();
+            $('#deviceContents-'+ptid).html('<div class="header-div">The device has disconnected</div><button class="tablinks backtab" id ="backtabdelete-'+ptid+'">Go back</button>');
+            $("#deviceInfo-"+ptid).remove();
+            $("#deviceStatistics-"+ptid).remove();
+            $("#deviceRunParams-"+ptid)
+            $("#deviceLogs-"+ptid).remove();
+            $("#backtabdelete-"+ptid).click(function(ev) {
+                $("#devicesListContainer").show();
+                $("#deviceContents-"+ptid).hide();
+            });
             if(--connectedDevs == 0)
                 printNoDevs();
         });
+        
+        
 
-        /* Create a tab in the left pane for this device. We can have
-           multiple devices connected and the tab in the left pane
-           enables us to click on a tab and manage the device
-           associated with this tab.
-        */
-        $('#nav').append('<li><a id="nav-'+ ptid+'" href="#">'+escapeHtml(info.ipaddr)+'<span>'+
-                         escapeHtml(info.devname)+'</a></span></li>');
-
-        if(++connectedDevs == 1) { // State change: no devices to at least one device.
-            $("#nodev").hide(); // Hide message: no devices connected ...
-            $("#dev-"+ptid).show(); // Show our new HTML
-            $("#nav-"+ptid).addClass("selected"); // Make the tabe in the left pane "selected"
+        
+        
+        
+        if(++connectedDevs == 1) {
+            $("#nodev").hide(); 
         }
-    } // End function devInfo
-
-    /* Function 'led' is installed as a SimpleMQ callback for the
-       events we receive on [topic "/m2m/led/device" and sub topic
-       "led"].  The device publishes to this topic/sub-topic when
-       either the device internally switches an LED or when it
-       receives a command from a browser.
-
-       Argument 'data' is a binary array of length two, where byte 1
-       contains the LED ID and byte two contains the on/off state.
-
-       * The LED's on/off switch is toggled by setting the checkbox's
-         "checked" attribute.
-       * The LED on/off state is changed by either adding or
-         removing the CSS class led-off.
-*/
-    function onLED(data, ptid) {
+    } //devInfo
+    
+        function onLED(data, ptid) {
         var ledId='#switch-'+ptid+'-'+data[0];
         var checked = data[1] ? true : false;
         $(ledId).prop('checked',checked);
@@ -269,77 +681,130 @@ $(function() {
         var tempId='#temp-'+ptid;
         $(tempId).html(temp2html(temp));
     };
+    
+    function onTorque(data, ptid) {
+        var b = new Uint8Array(data,0,2);
+        var torque = (new DataView(b.buffer)).getInt16(0);
+        var torqueId='#torque-'+ptid;
+        $(torqueId).html(torque2html(torque));
+    };
+    
+    function onTimeLeft(data, ptid) {
+        var b = new Uint8Array(data,0,2);
+        var time = (new DataView(b.buffer)).getInt16(0);
+        var timeId='#runtime-'+ptid;
+        $(timeId).html(time2html(time));
+    };
+    
+    function onPaintSize(data, ptid) {
+        var b = new Uint8Array(data,0,2);
+        var size = (new DataView(b.buffer)).getInt16(0);
+        var sizeId='#size-'+ptid;
+        $(sizeId).html(size2html(size));
+    };
+    
 
-    //When a new device broadcasts to all connected "display" units.
-    smq.subscribe("/m2m/led/device", "devinfo", {"datatype":"json", "onmsg":devInfo});
+    
+    /*function removeDevice(ptid){
+        $('#dev-'+ptid).remove();
+    };*/
+        <?lsp --[[if true then]] ?> smq.subscribe("/m2m/temp", {"onmsg":onTemp}); <?lsp --[[ end ]] ?>
+        smq.subscribe("/m2m/torque", {"onmsg":onTorque});
+        smq.subscribe("/m2m/time", {"onmsg":onTimeLeft});
+        smq.subscribe("/m2m/size", {"onmsg":onPaintSize});
+        smq.subscribe("self", {"datatype":"json", "onmsg":devInfo});
+    <?lsp
+    if tonumber(usersession.viewAllDevices)== 1 then 
+        local su=require"sqlutil"
+        local sql=string.format("companyName FROM company")
+
+        local function execute(cur)
+            local company = cur:fetch()
+            while company do  trace(company)?>
+                smq.subscribe("<?lsp=company?>", "devinfo", {"datatype":"json", "onmsg":devInfo}); //Devices that connect after browser has already connected-
+                smq.subscribe("<?lsp=company?>", {"onmsg":onLED});
+                smq.publish("Hello", "/m2m/led/display/"+"<?lsp=company?>");
+               <?lsp company = cur:fetch()
+            end
+            return true
+        end
+        
+        local function opendb() 
+            return su.open"file" 
+        end
+        
+        local ok,err=su.select(opendb,string.format(sql), execute)
+    else
+        ?>
+        smq.subscribe(getCompany(), "devinfo", {"datatype":"json", "onmsg":devInfo});
+                smq.subscribe(getCompany(), {"onmsg":onLED});
+                smq.publish("Hello", "/m2m/led/display/"+getCompany());
+        <?lsp
+        
+    end ?>
+
+
+
+    
+ //When a new device broadcasts to all connected "display" units.
+    //smq.subscribe(getCompany(), "devinfo", {"datatype":"json", "onmsg":devInfo});
+    //smq.subscribe("/m2m/led/device", {"datatype":"json", "onmsg":devInfo});
 
     //When a device responds to our "/m2m/led/display" published message.
-    smq.subscribe("self", "devinfo", {"datatype":"json", "onmsg":devInfo});
+    //smq.subscribe("self", "devinfo", {"datatype":"json", "onmsg":devInfo});
+    //smq.subscribe("self", {"datatype":"json", "onmsg":devInfo});
 
     //When a device publishes LED state change.
-    smq.subscribe("/m2m/led/device", "led", {"onmsg":onLED});
+    //smq.subscribe("/m2m/led/device", "led", {"onmsg":onLED});
+    //smq.subscribe(getCompany(), {"onmsg":onLED});
 
     //When a device publishes a new temperature.
-    smq.subscribe("/m2m/temp", {"onmsg":onTemp});
+
  
     //Broadcast to all connected devices.
     //Device will then send 'info' to our ptid ("self"), sub-tid: "devinfo".
-    smq.publish("Hello", "/m2m/led/display");
     
-    
-    /*function check(data, ptid) {
-        <?--lsp trace"checkingchecking123123" ?>
-    };
-    
-    
-    smq.subscribe("/m2m/temp/ss", {"onmsg":check});
-    
-    smq.publish("hello","/m2m/temp/ss");*/
-    
-    
-
-    /* Click event for managing the tabs in the left pane when we have
-       multiple devices connected. Clicking on a tab hides all
-       devices and then shows the HTML for the device we clicked on.
-       See the following for a 'tab' tutorial:
-       http://htmldog.com/articles/tabs/
-    */
-    $("#nav").on("click", "a", function() {
-        var ptid = $(this).prop('id').match(/(\d+)/)[0]; // Extract ptid from HTML ID element
-        $("#nav a").removeClass("selected"); // Remove 'selected' from all tabs
-        $(this).addClass("selected"); // Set 'selected' for the tab we clicked on
-        $("#devices > div").hide(); // Hide all devices
-        $("#dev-"+ptid).show(); //Show the device associated with the 'tab' we clicked on
-        return false;
-    });
-
+    //smq.publish("Hello", "/m2m/led/display/"+getCompany());
 });
 
 </script>
+
 </head>
-
 <body>
-  <table>
-    <tr>
-      <td valign="top">
-        <ul id="nav">
-          <li><a id="nav-0" href="#">No devices<span>There are currently no devices connected.</span></a></li>
-        </ul>
-      </td>
-      <td valign="top" id="devices">
-        <div id="dev-0" style="max-width:600px">
-            If this is the only tab you see, it means that no devices are currently connected. Please go into the connect device
-            tab if you believe this to be in error.
+<div id="new-header">
+    <script>
+    $("#new-header").load("header.lsp", function() {
+        $('#header-deviceList').addClass('active');
+    });
+    </script>
+</div>
 
 
-
+  <div class="container">
+	<div class="row">
+        <div class="panel panel-default user_panel" id = "devicesListContainer">
+            <div class="panel-heading">
+                <h3 class="panel-title">Devices list</h3>
+            </div>
+            <div id="nodev">
+                <h2>Connecting....</h2>
+            </div>
+            <div class="panel-body">
+				<div class="table-container" >
+                    <table class="table-users table"   border="0">
+                        <tbody id = "devicesList" >
+                        </tbody>
+                    </table>
+                </div>
+            </div>
         </div>
-      </td>
-    </tr>
-  </table>
-  <div id="nodev">
-    <h2>Connecting....</h2>
-  </div>
-  <a href="options.lsp">Go back</a>
+        
+        <div id ="deviceSettingInjection">
+                
+           </div>
+        
+        
+	</div>
+</div>
 </body>
 </html>

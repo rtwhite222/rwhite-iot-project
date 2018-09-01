@@ -1,5 +1,20 @@
 <!DOCTYPE html>
- 
+ <nav class="navbar navbar-inverse">
+  <div class="container-fluid">
+    <div class="navbar-header">
+      <a class="navbar-brand" href="#">Othername</a>
+    </div>
+    <ul class="nav navbar-nav">
+      <li class="active"><a href="#">Devices</a></li>
+      <li><a href="#">Page 1</a></li>
+      <li><a href="#">Page 2</a></li><li><a href="#">Page 2</a></li><li><a href="#">Page 2</a></li>
+    </ul>
+    <ul class="nav navbar-nav navbar-right">
+      <li><a href="#"><span class="glyphicon glyphicon-user"></span> My Profile</a></li>
+      <li><a href="#"><span class="glyphicon glyphicon-log-in"></span> Log Out</a></li>
+    </ul>
+  </div>
+</nav> 
 <?lsp
 
 usersession = request:session()
@@ -12,9 +27,6 @@ function checkLogin()
 end
 checkLogin()
 
-if (tonumber(usersession.addNewDevice) == 0) then
-    print("ACCESS DENIED") 
-    else
 ?>
 
 <html>
@@ -28,30 +40,30 @@ if (tonumber(usersession.addNewDevice) == 0) then
 <style>form {
     display: inline-block; //Or display: inline; 
 }
-
-}
 tr:hover{
     background-color: #ddd;
     color: black;
 }
-
-.submit-btn {
+input[type=text] {
+    float: right;
+    border: none;
+    margin-top: 8px;
+    margin-right: 16px;
+    font-size: 17px;
+    
+}
+.search-container {
   float: right;
+}
+
+.search-container input[type=submit] {
+  float: right;
+  margin-top: 8px;
   margin-right: 16px;
   background: #ddd;
   font-size: 17px;
   border: none;
   cursor: pointer;
-}
-.clickable-row {font-size: 17px;
-vertical-align: middle;
-}
-
-select {
-    border: none;
-    margin-top: 8px;
-    margin-right: 16px;
-    font-size: 17px;
 }
 
 body {
@@ -67,38 +79,7 @@ body {
 <script src="/rtl/smq.js"></script>
 <script src="/rtl/jquery.js"></script>
 <script>
-function getCompanyName(){
-html = ""
 
-<?lsp
- if tonumber(usersession.viewAllDevices) == 1 then
- local su=require"sqlutil"
-        local sql=string.format("companyName FROM company")
-        
-        local function execute(cur)
-            local company = cur:fetch()
-            while company do 
-            ?>
-               html+="<option value=<?lsp=company ?>><?lsp=company?></option>"
-               <?lsp 
-               company = cur:fetch()
-            end
-            return true
-        end
-        
-        local function opendb() 
-            return su.open"file" 
-        end
-        
-        local ok,err=su.select(opendb,string.format(sql), execute)
-        
-        
-else ?>
- html+="<option value=<?lsp=usersession.company?>><?lsp=usersession.company?></option>"        
-<?lsp end ?>
-
-return html
-}
 function escapeHtml(unsafe) {
     return unsafe
         .replace(/&/g, "&amp;")
@@ -112,9 +93,34 @@ function getCompany(){
 return company
 };
 
+function mkLedName(name) {
+    return '<td>'+name+'</td>';
+}
+
+function mkLed(ptid,ledId,color,on) {
+    return '<td><div id="led-'+ptid+ledId+'" class="led-'+
+        color+(on ? '' : ' led-off')+'"></div></td>';
+}
+
+function mkLedSwitch(ptid,ledId,on) {
+    var x ="0"
+
+        
+    return x;
+}
+
+function temp2html(temp) {
+    temp /= 10;
+    return "Temperature: " + temp + "  &#x2103; <span>(" + 
+        Math.round(temp*9/5+32) + " &#x2109;)</span>";
+}
+
 function printNoDevs() {
     $("#nodev").html('<h2 align="center">There are currently no devices connected</h2><br><h3 align="center">Please make sure that the device you wish to register has an internet connection</h3>').show();
 };
+
+
+
 
 $(function() {
     var connectedDevs=0;
@@ -164,28 +170,18 @@ $(function() {
             "<td>"+
                 escapeHtml(info.ipaddr)+
             "</td>"+
-            "<td align='center' class='row-format'>"+
-                "Register to company:   <select id='companyInput"+ptid+"'>"+getCompanyName()+"</select>"+
-                "<button class='submit-btn' type = 'submit' id = 'submit"+ptid+"'>Register Device</button>"+
+            "<td align='center'>"+
+                "Product code<br><small class='text-muted'>a23.f43.2342o</small>"+
             "</td>"+
         "</tr> ");
         $("#devicesList").append(html);
-        
-        $("#submit"+ptid).click(function(ev) {
+        $(".clickable-row").click(function(ev) {
             var message = '#dev-'+ptid;
-            smq.publish($("#companyInput"+ptid).val()+"\0",ptid);
+            smq.publish(getCompany()+"\0",ptid);
             smq.publish(message,"deviceremove")
-            $.ajax({
-              type: "POST",
-              url: "deviceaddservercode.lsp",
-              data: {deviceModel: info.devname,companyName: $("#companyInput"+ptid).val(),deviceIP:info.ipaddr},
-            success: function(output) {
-                  alert(output);
-                  if(--connectedDevs == 0)
+            $.post("test2.lsp", {deviceModel: info.devname,companyName: getCompany(),deviceIP:info.ipaddr})
+            if(--connectedDevs == 0)
                 printNoDevs();
-              }
-            });
-            
         });
         smq.observe(ptid, function() {
             $('#dev-'+ptid).remove();
@@ -199,9 +195,9 @@ $(function() {
     } //devInfo
     
     
-    /*function removeDevice(ptid){
+    function removeDevice(ptid){
         $('#dev-'+ptid).remove();
-    };*/
+    };
     
     
     smq.subscribe("nocompany", {"datatype":"json", "onmsg":devInfo});
@@ -217,16 +213,8 @@ $(function() {
 
 </script>
 </head>
+
 <body>
-<div id="new-header">
-    <script>
-    $("#new-header").load("header.lsp?version=9", function() {
-        $('#header-addDevices').addClass('active');
-    });
-    </script>
-</div>
-
-
   <div class="container">
 	<div class="row">
         <div class="panel panel-default user_panel">
@@ -250,4 +238,3 @@ $(function() {
 </div>
 </body>
 </html>
-<?lsp end ?>

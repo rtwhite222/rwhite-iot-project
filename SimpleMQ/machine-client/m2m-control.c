@@ -111,6 +111,7 @@
 
 
 
+
 /****************************************************************************
  **************************-----------------------***************************
  **************************| BOARD SPECIFIC CODE |***************************
@@ -142,6 +143,7 @@ static const char* simpleMqUrl; /* defaults to SIMPLEMQ_DOMAIN */
  */
 #define KEY_UP_ARROW 1000
 #define KEY_DOWN_ARROW 1001
+#define DEBUG 1
 static int currentTemperature=0; /* simulated value */
 
 /* Replace with a function that prints to a console or create a stub
@@ -167,6 +169,7 @@ void setProgramStatus(ProgramStatus s)
 
 
 
+#define GPIO_ON_BUTTON 4
 /* The list of LEDs in the device, the name, color, and ID. Adapt this
    list to the LEDs on your evaluation board (Ref-LED).
 
@@ -194,7 +197,7 @@ static const MachineInfo machineInfo[] = {
    },
    {
       "On Button",
-      4
+      GPIO_ON_BUTTON
    }
 };
 
@@ -667,7 +670,12 @@ sendDevInfo(SharkMQ* smq, const char* ipaddr, U32 tid, U32 subtid, const char* c
    int val;
    const MachineInfo* machineInfo = getMachineInfo(&ledLen);
 
-   SharkMQ_wrtstr(smq, "\",\"leds\":[");
+   xprintf(("{\"ipaddr\":\"\n"));
+   xprintf(("%s\n", ipaddr));
+   xprintf(("\",\"devname\":\"\n"));
+   xprintf(("%s\n", (getDevName())));
+   xprintf(("\",\"company\":\"\n"));
+   xprintf(("%s\n", company));
    SharkMQ_wrtstr(smq, "{\"ipaddr\":\"");
    SharkMQ_wrtstr(smq, ipaddr);
    SharkMQ_wrtstr(smq, "\",\"devname\":\"");
@@ -818,6 +826,7 @@ m2mled(SharkMQ* smq, SharkSslCon* scon,
       {
          U8* msg;
          int result = SharkMQ_getMessage(smq,&msg);
+         xprintf(("getMessage: company = \"%s\"\n", company));
          if(result < 0)
          {
             switch(result)
@@ -826,6 +835,7 @@ m2mled(SharkMQ* smq, SharkSslCon* scon,
                   discoveryTid = smq->ptid;
                   break;
                case SMQ_CREATEACK:
+                  xprintf(("SMQ_CREATEACK: company = \"%s\"\n", company));
                   nocompanyTid = smq->ptid;
                   SharkMQ_wrtstr(smq, "{\"ipaddr\":\"");
                   SharkMQ_wrtstr(smq, ipaddr);
@@ -864,6 +874,7 @@ m2mled(SharkMQ* smq, SharkSslCon* scon,
       {
          if(smq->tid == smq->clientTid){
             strncpy(company, (char*)msg, strlen((char *)msg));
+            xprintf(("received company name %s\n",company));
             check = 1;
             SharkMQ_unsubscribe(smq,discoveryTid);
          }
@@ -889,6 +900,7 @@ m2mled(SharkMQ* smq, SharkSslCon* scon,
          int on;
          if(setGPIOFromDevice(&x,&on))
          {
+            xprintf(("1 device %i state %i\n", x, on));
             setGPIO(x,on);
          }
 #ifdef ENABLE_TEMP
@@ -903,6 +915,7 @@ m2mled(SharkMQ* smq, SharkSslCon* scon,
     * topic where we publish the device capabilities as JSON data.
     */
    SharkMQ_create(smq, company);
+   xprintf(("1 using company \"%s\"\n", company));
 
 #ifdef ENABLE_TEMP
    /* Request broker to return a topic ID for "/m2m/temp", the
@@ -925,11 +938,20 @@ m2mled(SharkMQ* smq, SharkSslCon* scon,
     */
    char subtopic[80];
    sprintf(subtopic,"/m2m/led/display/%s",company);
+   xprintf(("2 using company \"%s\"\n", company));
+   xprintf(("2 using subtopic \"%s\"\n", subtopic));
    SharkMQ_subscribe(smq, subtopic);
+   xprintf(("3 using company \"%s\"\n", company));
 
+   int timer = 0;
+   int button_state = 0;
    smq->timeout=50; /* Poll so we can locally update the LED buttons. */
    for(;;)
    {
+      if (button_state == 1)
+      {
+         timer += 1;
+      }
       U8* msg;
       U8 outData[2];
       int len =  SharkMQ_getMessage(smq, &msg);
@@ -941,9 +963,11 @@ m2mled(SharkMQ* smq, SharkSslCon* scon,
 
             /* Manage responses for create, createsub, and subscribe */
             case SMQ_SUBACK: /* ACK: "/m2m/led/display" */
+               xprintf(("SMQ_SUBACK: company \"%s\"\n", company));
                displayTid = smq->ptid;
                break;
             case SMQ_CREATEACK:  /* ACK: "/m2m/temp" or "/m2m/led/device" */
+               xprintf(("SMQ_CREATEACK: company \"%s\"\n", company));
 #ifdef ENABLE_TEMP
                if( ! strcmp("/m2m/temp", (char*)msg ) )
                   tempTid = smq->ptid;
@@ -955,6 +979,7 @@ m2mled(SharkMQ* smq, SharkSslCon* scon,
                }
                break;
             case SMQ_CREATESUBACK: /* We get a total of two messages */
+               xprintf(("SMQ_CREATESUBACK: company \"%s\"\n", company));
                 /* We get two suback messages ("devinfo" and "led") */
                if( ! strcmp("led", (char*)msg ) )
                {  /* Ack for: SMQ_createsub(smq, "led"); */
@@ -969,11 +994,13 @@ m2mled(SharkMQ* smq, SharkSslCon* scon,
                      info message.  All connected browsers will
                      receive this message and update their UI accordingly.
                   */
+                  xprintf(("1 sending company \"%s\"\n", company));
                   sendDevInfo(smq, ipaddr, deviceTid, devInfoSubTid, company);
                }
                break;
 
             case SMQ_SUBCHANGE:
+               xprintf(("SMQ_SUBCHANGE: company \"%s\"\n", company));
                xprintf(("Connected browsers: %d\n", smq->status));
                break;
 
@@ -997,16 +1024,30 @@ m2mled(SharkMQ* smq, SharkSslCon* scon,
       }
       else if(len > 0)
       {
+         xprintf(("len > 0 start: company \"%s\"\n", company));
          if(smq->tid == displayTid) /* topic "display" */
          {
             /* Send device info to the new display unit: Send to
              * browser's ephemeral ID (ptid).
              */
+            xprintf(("2 sending company \"%s\"\n", company));
             sendDevInfo(smq, ipaddr, smq->ptid, devInfoSubTid, company);
          }
          else if(smq->tid == smq->clientTid) /* sent to our ephemeral tid */
          {
+            xprintf(("2 device %i state %i\n", msg[0], msg[1]));
             msg[1] = setGPIO(msg[0], msg[1]);
+            if (msg[1] == 1)
+            {
+                xprintf(("Power ON!!"));
+                button_state = 1;
+                timer = 0;
+            } else
+            {
+                xprintf(("Power OFF!!"));
+                button_state = 0;
+                xprintf(("Power was on for %i seconds!!", (int)(timer/20)));
+            }
             if(msg[1] == -1)
             {
                xprintf(("ptid %X attempting to set invalid LED %d\n",
@@ -1024,6 +1065,7 @@ m2mled(SharkMQ* smq, SharkSslCon* scon,
             xprintf(("Received unknown tid %X\n", smq->tid));
             return 0;
          }
+         xprintf(("len > 0 end: company \"%s\"\n", company));
       }
       else /* timeout */
       {
@@ -1035,6 +1077,7 @@ m2mled(SharkMQ* smq, SharkSslCon* scon,
             outData[1] = (U8)on;
             /* Publish to "/m2m/led/device", sub-topic "led" */
             SharkMQ_publish(smq, outData, 2, deviceTid, ledSubTid);
+            xprintf(("3 device %i state %i\n", x, on));
             setGPIO(x, on); /* set the LED on/off */
          }
 #ifdef ENABLE_TEMP
